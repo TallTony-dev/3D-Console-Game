@@ -18,11 +18,10 @@ namespace _3D_Console_Game
             {
                 double deltaTime = ((double)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000) - prevTime;
 
-                if (deltaTime >= 0.09)
+                if (deltaTime >= 0.01)
                 {
                     prevTime += deltaTime;
 
-                    InputManager.UpdateKey();
                     game.UpdateGame(deltaTime);
 
                     game.DrawGame();

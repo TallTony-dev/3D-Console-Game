@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace _3D_Console_Game
 {
-    internal class Wall
+    internal class Wall : Drawable
     {
         Vector3 pos;
         Vector3 TopLeft { get { return pos + HeightVec; } }
@@ -37,7 +37,7 @@ namespace _3D_Console_Game
             return false;
         }
 
-        public void Draw(Display display)
+        public override void Draw(Display display)
         {
             display.DrawSquare(new Vector4(TopLeft, 1), new Vector4(TopRight, 1), new Vector4(BottomLeft, 1), new Vector4(BottomRight, 1), color);
             display.DrawSquare(new Vector4(BottomLeft, 1), new Vector4(BottomRight, 1), new Vector4(TopLeft, 1), new Vector4(TopRight, 1), color);
