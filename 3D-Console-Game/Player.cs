@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -11,6 +12,8 @@ namespace _3D_Console_Game
     {
         public Prism hitbox = new Prism();
         Quaternion view = Quaternion.Identity;
+        float yaw = 0f;
+        float pitch = 0f;
         Vector3 camPos = Vector3.Zero;
         Vector3 playerPos = Vector3.Zero; 
         public Matrix4x4 ViewMatrix { 
@@ -19,12 +22,16 @@ namespace _3D_Console_Game
                 // First undo rotation (conjugate), then undo translation (negate)
                 Matrix4x4 rot = Matrix4x4.CreateFromQuaternion(Quaternion.Conjugate(view));
                 Matrix4x4 trans = Matrix4x4.CreateTranslation(-camPos);
-                return trans * rot;
+                Matrix4x4 vertInvert = Matrix4x4.Identity;
+                vertInvert.M22 = -1;
+                return trans * rot * vertInvert;
             } 
         }
 
         float moveSpeed = 5f;
         float rotSpeed = 2f;
+
+        Vector3 playerVel;
 
         public void Update(double deltaTime)
         {
@@ -32,44 +39,49 @@ namespace _3D_Console_Game
             Vector3 forward = Vector3.Transform(-Vector3.UnitZ, view);
             Vector3 left = Vector3.Transform(-Vector3.UnitX, view);
 
+            bool isTouchingGround = playerPos.Y == 0;
+
             if (InputManager.IsCharPressedAsync('W'))
             {
-                playerPos += forward * moveSpeed * dt;
+                playerVel += forward * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, forward)) + 0.1f);
             }
             if (InputManager.IsCharPressedAsync('S'))
             {
-                playerPos -= forward * moveSpeed * dt;
+                playerVel -= forward * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, forward)) + 0.1f);
             }
             if (InputManager.IsCharPressedAsync('A'))
             {
-                playerPos += left * moveSpeed * dt;
+                playerVel += left * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, left)) + 0.1f);
             }
             if (InputManager.IsCharPressedAsync('D'))
             {
-                playerPos -= left * moveSpeed * dt;
+                playerVel -= left * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, left)) + 0.1f);
+            }
+            if (InputManager.IsCharPressedAsync(0x20) && isTouchingGround)
+            {
+                playerVel.Y = 3f;
             }
 
-            camPos = playerPos + new Vector3(0, 0.2f, 0);
+
+            playerVel -= new Vector3(Math.Sign(playerVel.X) * 2f * dt, dt * 4, Math.Sign(playerVel.Z) * 2f * dt);
+            playerPos += Vector3.Multiply((float)deltaTime, playerVel);
+
+            if (playerPos.Y < 0)
+            {
+                playerPos.Y = 0;
+                playerVel.Y = 0;
+            }
+
+            camPos = playerPos + new Vector3(0, 1f, 0);
 
             Vector2 delta = InputManager.GetMouseDelta();
-            view = Quaternion.Multiply(view, Quaternion.CreateFromYawPitchRoll(rotSpeed * dt * delta.X / 20, -rotSpeed * dt * delta.Y / 20, 0));
+            
+            yaw += rotSpeed * dt * delta.X / 20;
+            pitch += rotSpeed * dt * delta.Y / 20;
+            pitch = Math.Clamp(pitch, -MathF.PI / 2 + 0.01f, MathF.PI / 2 - 0.01f);
 
-            if (InputManager.IsKeyDown(ConsoleKey.UpArrow))
-            {
-                view = Quaternion.Multiply(view, Quaternion.CreateFromYawPitchRoll(0, -rotSpeed * dt, 0));
-            }
-            if (InputManager.IsKeyDown(ConsoleKey.DownArrow))
-            {
-                view = Quaternion.Multiply(view, Quaternion.CreateFromYawPitchRoll(0, rotSpeed * dt, 0));
-            }
-            if (InputManager.IsKeyDown(ConsoleKey.RightArrow))
-            {
-                view = Quaternion.Multiply(view, Quaternion.CreateFromYawPitchRoll(-rotSpeed * dt, 0, 0));
-            }
-            if (InputManager.IsKeyDown(ConsoleKey.LeftArrow))
-            {
-                view = Quaternion.Multiply(view, Quaternion.CreateFromYawPitchRoll(rotSpeed * dt, 0, 0));
-            }
+            view = Quaternion.CreateFromAxisAngle(Vector3.UnitY, yaw) * Quaternion.CreateFromAxisAngle(Vector3.UnitX, pitch);
+
 
         }
 
