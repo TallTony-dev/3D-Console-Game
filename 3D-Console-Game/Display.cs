@@ -241,62 +241,17 @@ namespace _3D_Console_Game
                 }
             }
 
-
-
-            //draw header
-            for (int x = 0; x < display.GetLength(0) + 2; x++)
-            {
-                if (x == 0) { buf.Append('┌'); continue; }
-                if (x == display.GetLength(0) + 1) { buf.Append('┐'); continue; }
-                buf.Append('─');
-            }
-            buf.AppendLine();
-
-            buf.AppendLine("│ WOAH its super hexagon lowkey, use ur arrow keys to move and dodge the things │");
-            buf.AppendLine($"│ SCORE: {score}             KEEP GOING U GOT THIS TWINNNNNN    │");
-
-            for (int x = 0; x < display.GetLength(0) + 2; x++)
-            {
-                if (x == 0) { buf.Append('└'); continue; }
-                if (x == display.GetLength(0) + 1) { buf.Append('┘'); continue; }
-                buf.Append('─');
-            } buf.AppendLine();
-
-
-
-
-            for (int x = 0; x < display.GetLength(0) + 2; x++)
-            {
-                if (x == 0) { buf.Append('┌'); continue; }
-                if (x == display.GetLength(0) + 1) { buf.Append('┐'); continue; }
-                buf.Append('─');
-            }
-            buf.AppendLine();
-
             for (int y = 0; y < display.GetLength(1); y++)
             {
-                for (int x = -1; x < display.GetLength(0); x++)
+                for (int x = 0; x < display.GetLength(0); x++)
                 {
-                    if (x == -1)
-                    {
-                        buf.Append('│');
-                        continue;
-                    }
 
                     buf.Append(GetAnsiForegroundColor(display[x, y].col));
                     buf.Append(display[x, y].c);
                     buf.Append(RESET);
                 }
-                buf.Append('│');
                 buf.AppendLine();
             }
-            for (int x = 0; x < display.GetLength(0) + 2; x++)
-            {
-                if (x == 0) { buf.Append('└'); continue; }
-                if (x == display.GetLength(0) + 1) { buf.Append('┘'); continue; }
-                buf.Append('─');
-            }
-            buf.AppendLine();
 
             Console.SetCursorPosition(0, 0);
             Console.Write(buf.ToString());

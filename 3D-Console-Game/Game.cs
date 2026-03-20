@@ -21,8 +21,10 @@ namespace _3D_Console_Game
         GameState state = GameState.Menu;
         public void UpdateGame(double deltaTime)
         {
+            InputManager.UpdateKey();
             if (state == GameState.inGame)
             {
+                InputManager.UpdateMousePos();
                 display.Update(deltaTime, player);
                 player.Update(deltaTime);
                 //timeCount += deltaTime;
@@ -51,8 +53,9 @@ namespace _3D_Console_Game
                 display.DrawMenu();
                 if (InputManager.IsKeyPressed(ConsoleKey.Enter))
                 {
-                    display = new Display(Console.WindowWidth - 10, Console.WindowHeight - 7);
+                    display = new Display(Console.WindowWidth, Console.WindowHeight - 1);
                     state = GameState.inGame;
+
                 }
             }
             else if (state == GameState.Loss)
@@ -82,10 +85,9 @@ namespace _3D_Console_Game
 
             if (state == GameState.inGame)
             {
-                for (int i = activeWalls.Count - 1; i >= 0; i--)
+                foreach (Wall wall in activeWalls)
                 {
-                    var wall = activeWalls[i];
-                    wall.Draw(display);
+                    Task.Run(() => wall.Draw(display));
                 }
 
 

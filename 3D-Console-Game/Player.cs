@@ -32,24 +32,27 @@ namespace _3D_Console_Game
             Vector3 forward = Vector3.Transform(-Vector3.UnitZ, view);
             Vector3 left = Vector3.Transform(-Vector3.UnitX, view);
 
-            if (InputManager.IsKeyDown(ConsoleKey.W))
+            if (InputManager.IsCharPressedAsync('W'))
             {
                 playerPos += forward * moveSpeed * dt;
             }
-            if (InputManager.IsKeyDown(ConsoleKey.S))
+            if (InputManager.IsCharPressedAsync('S'))
             {
                 playerPos -= forward * moveSpeed * dt;
             }
-            if (InputManager.IsKeyDown(ConsoleKey.A))
+            if (InputManager.IsCharPressedAsync('A'))
             {
                 playerPos += left * moveSpeed * dt;
             }
-            if (InputManager.IsKeyDown(ConsoleKey.D))
+            if (InputManager.IsCharPressedAsync('D'))
             {
                 playerPos -= left * moveSpeed * dt;
             }
 
             camPos = playerPos + new Vector3(0, 0.2f, 0);
+
+            Vector2 delta = InputManager.GetMouseDelta();
+            view = Quaternion.Multiply(view, Quaternion.CreateFromYawPitchRoll(rotSpeed * dt * delta.X / 20, -rotSpeed * dt * delta.Y / 20, 0));
 
             if (InputManager.IsKeyDown(ConsoleKey.UpArrow))
             {
