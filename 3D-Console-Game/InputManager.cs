@@ -38,8 +38,9 @@ namespace _3D_Console_Game
         static extern bool SetCursorPos(int X, int Y);
         [DllImport("user32.dll")]
         private static extern short GetAsyncKeyState(int vKey);
+        //[DllImport("user32.dll")]
+        //private static extern int ShowCursor(bool bShow);
 
-        
 
         public static void UpdateMousePos()
         {
@@ -48,6 +49,14 @@ namespace _3D_Console_Game
             SetCursorPos(500, 500);
         }
 
+        //public static void HideCursor()
+        //{
+        //    ShowCursor(false);
+        //}
+        //public static void ShowCursor()
+        //{
+        //    ShowCursor(true);
+        //}
         public static Point GetMousePos()
         {
             return currentPos;

@@ -34,8 +34,6 @@ namespace _3D_Console_Game
                     activeWalls.Add(new Wall(1, new Vector3(0, 0, 0), new Vector3(1, 0, 0), ConsoleColor.Red));
                     activeWalls.Add(new Wall(1, new Vector3(0, 0, 0), new Vector3(0, 1, 0), ConsoleColor.Green));
                     activeWalls.Add(new Wall(1, new Vector3(0, 0, 0), new Vector3(0, 0, 1), ConsoleColor.Blue));
-
-
                 }
                 foreach (var wall in activeWalls)
                 {
@@ -53,7 +51,7 @@ namespace _3D_Console_Game
                 display.DrawMenu();
                 if (InputManager.IsKeyPressed(ConsoleKey.Enter))
                 {
-                    display = new Display(Console.WindowWidth, Console.WindowHeight - 1);
+                    display = new Display(Console.WindowWidth - 1, Console.WindowHeight - 2);
                     state = GameState.inGame;
 
                 }

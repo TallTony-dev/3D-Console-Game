@@ -12,7 +12,6 @@ namespace _3D_Console_Game
             Game game = new Game();
 
             Console.CursorVisible = false;
-            //Console.ForegroundColor = ConsoleColor.Green;
 
             while (true)
             {

@@ -263,7 +263,7 @@ namespace _3D_Console_Game
             int width = values.GetLength(0);
             int height = values.GetLength(1);
             buf.Append(GetAnsiForegroundColor(ConsoleColor.Cyan));
-            buf.Append("Welcome to super hexagon, press enter to start");
+            buf.Append("Welcome to the super cool 3d game, press enter to start");
             buf.Append(RESET);
 
             Console.Clear();
