@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace _3D_Console_Game
 {
-    internal abstract class Drawable
+    internal interface IDrawable
     {
-        public abstract void Draw(Display display);
+        public void Draw(Display display);
     }
 }

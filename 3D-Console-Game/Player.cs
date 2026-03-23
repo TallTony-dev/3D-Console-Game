@@ -10,7 +10,22 @@ namespace _3D_Console_Game
 {
     internal class Player
     {
-        public Prism hitbox = new Prism();
+        float width = 0.8f;
+        float height = 2;
+        float depth = 0.8f;
+        public Prism Hitbox
+        {
+            get
+            {
+                Prism prism = new Prism();
+                prism.pos = playerPos;
+                prism.pos -= new Vector3(width / 2, 0, depth / 2);
+                prism.width = width;
+                prism.height = height;
+                prism.depth = depth;
+                return prism;
+            }
+        }
         Quaternion view = Quaternion.Identity;
         float yaw = 0f;
         float pitch = 0f;
@@ -39,31 +54,32 @@ namespace _3D_Console_Game
             Vector3 forward = Vector3.Transform(-Vector3.UnitZ, view);
             Vector3 left = Vector3.Transform(-Vector3.UnitX, view);
 
+            Vector3 xzForward = Vector3.Normalize(forward * new Vector3(1, 0, 1));
+            Vector3 xzLeft = Vector3.Normalize(left * new Vector3(1, 0, 1));
+
             bool isTouchingGround = playerPos.Y == 0;
+
+            
 
             if (InputManager.IsCharPressedAsync('W'))
             {
-                playerVel += forward * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, forward)) + 0.1f);
+                playerVel += xzForward * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzForward)) + 0.1f);
             }
             if (InputManager.IsCharPressedAsync('S'))
             {
-                playerVel -= forward * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, forward)) + 0.1f);
+                playerVel -= xzForward * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzForward)) + 0.1f);
             }
             if (InputManager.IsCharPressedAsync('A'))
             {
-                playerVel += left * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, left)) + 0.1f);
+                playerVel += xzLeft * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzLeft)) + 0.1f);
             }
             if (InputManager.IsCharPressedAsync('D'))
             {
-                playerVel -= left * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, left)) + 0.1f);
-            }
-            if (InputManager.IsCharPressedAsync(0x20) && isTouchingGround)
-            {
-                playerVel.Y = 3f;
+                playerVel -= xzLeft * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzLeft)) + 0.1f);
             }
 
 
-            playerVel -= new Vector3(Math.Sign(playerVel.X) * 2f * dt, dt * 4, Math.Sign(playerVel.Z) * 2f * dt);
+            playerVel -= new Vector3(Math.Sign(playerVel.X) * 2f * dt, dt * 8, Math.Sign(playerVel.Z) * 2f * dt);
             playerPos += Vector3.Multiply((float)deltaTime, playerVel);
 
             if (playerPos.Y < 0)
@@ -72,7 +88,87 @@ namespace _3D_Console_Game
                 playerVel.Y = 0;
             }
 
-            camPos = playerPos + new Vector3(0, 1f, 0);
+            Prism hitbox = Hitbox;
+            foreach (object obj in Game.activeWalls)
+            {
+                Task.Run(() =>
+                {
+                    if (obj is ICollidable collidable)
+                    {
+                        (bool collides, Vector3 norm) = collidable.CollidesWith(Hitbox);
+                        if (collides)
+                        {
+                            hitbox = Hitbox;
+                            Vector3 hitboxMin = hitbox.pos;
+                            Vector3 hitboxMax = hitbox.pos + new Vector3(hitbox.width, hitbox.height, hitbox.depth);
+
+                            Prism aabb = collidable.AABB;
+                            Vector3 aabbMin = aabb.pos;
+                            Vector3 aabbMax = aabb.pos + new Vector3(aabb.width, aabb.height, aabb.depth);
+
+                            // Compute overlap on each axis
+                            float overlapX = Math.Min(hitboxMax.X - aabbMin.X, aabbMax.X - hitboxMin.X);
+                            float overlapY = Math.Min(hitboxMax.Y - aabbMin.Y, aabbMax.Y - hitboxMin.Y);
+                            float overlapZ = Math.Min(hitboxMax.Z - aabbMin.Z, aabbMax.Z - hitboxMin.Z);
+
+                            if (overlapX <= 0 || overlapY <= 0 || overlapZ <= 0)
+                                return;
+
+                            // Resolve along the axis of minimum penetration (MTV)
+                            Vector3 resolution;
+                            float penetration;
+                            Vector3 hitboxCenter = hitbox.MidPoint;
+                            Vector3 aabbCenter = aabb.MidPoint;
+
+                            if (overlapX <= overlapY && overlapX <= overlapZ)
+                            {
+                                float sign = Math.Sign(hitboxCenter.X - aabbCenter.X);
+                                if (sign == 0) sign = 1;
+                                resolution = new Vector3(sign, 0, 0);
+                                penetration = overlapX;
+                            }
+                            else if (overlapY <= overlapX && overlapY <= overlapZ)
+                            {
+                                float sign = Math.Sign(hitboxCenter.Y - aabbCenter.Y);
+                                if (sign == 0) sign = 1;
+                                resolution = new Vector3(0, sign, 0);
+                                penetration = overlapY;
+                            }
+                            else
+                            {
+                                float sign = Math.Sign(hitboxCenter.Z - aabbCenter.Z);
+                                if (sign == 0) sign = 1;
+                                resolution = new Vector3(0, 0, sign);
+                                penetration = overlapZ;
+                            }
+
+                            if (resolution.Y > 0.7f)
+                            {
+                                isTouchingGround = true;
+                            }
+
+                            if (penetration > 0)
+                            {
+                                playerPos += resolution * (penetration + 0.001f);
+                            }
+
+                            // Remove velocity component along the resolution direction
+                            float velAlongNormal = Vector3.Dot(playerVel, resolution);
+                            if (velAlongNormal < 0)
+                            {
+                                playerVel -= velAlongNormal * resolution;
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (InputManager.IsCharPressedAsync(0x20) && isTouchingGround)
+            {
+                playerVel.Y = 5f;
+            }
+
+            camPos = playerPos + new Vector3(0, 1.3f, 0);
 
             Vector2 delta = InputManager.GetMouseDelta();
             

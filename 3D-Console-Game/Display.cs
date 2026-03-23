@@ -87,20 +87,19 @@ namespace _3D_Console_Game
             DrawTriangle(vertices[0..3]);
             DrawTriangle(vertices[3..6]);
         }
-
-
-        public void DrawTriangle((Vector4 vec, ConsoleColor col)[] vertices)
+        private void RasterizeClipSpaceTriangle(Vector4 a, Vector4 b, Vector4 c, ConsoleColor color)
+        {
+            RasterizeClipSpaceTriangle(new (Vector4, ConsoleColor)[] { (a, color), (b, color), (c, color) });
+        }
+        private void RasterizeClipSpaceTriangle((Vector4 vec, ConsoleColor col)[] vertices)
         {
             int maxXLen = values.GetLength(0);
             int maxYLen = values.GetLength(1);
 
             for (int i = 0; i < vertices.Length; i++)
             {
-                vertices[i].vec = Vector4.Transform(vertices[i].vec, viewMatrix);
-                vertices[i].vec = Vector4.Transform(vertices[i].vec, projectionMatrix);
 
                 // LLM:Perspective divide: convert from clip space to NDC
-                if (vertices[i].vec.W <= 0) return; // behind camera, skip triangle
                 float w = vertices[i].vec.W;
                 vertices[i].vec = new Vector4(
                     vertices[i].vec.X / w,
@@ -125,34 +124,130 @@ namespace _3D_Console_Game
             int minY = Math.Max(0, (int)vertices.Min(v => v.vec.Y));
             int maxY = Math.Min(maxYLen, (int)MathF.Ceiling(vertices.Max(v => v.vec.Y)));
 
+            float triArea = EdgeFunction(a, b, c);
+            if (triArea == 0) return;
+
             for (int x = minX; x < maxX; x++)
             {
-                    for (int y = minY; y < maxY; y++)
+                for (int y = minY; y < maxY; y++)
+                {
+                    //go to all the values in between and set stuff
+
+                    Vector4 p = new(x, y, 0, 0);
+                    float ABP = EdgeFunction(a, b, p);
+                    float BCP = EdgeFunction(b, c, p);
+                    float CAP = EdgeFunction(c, a, p);
+
+                    if ((ABP <= 0 && BCP <= 0 && CAP <= 0) || (ABP >= 0 && BCP >= 0 && CAP >= 0))
                     {
-                            //go to all the values in between and set stuff
+                        // LLM: Barycentric weights for perspective-correct interpolation
+                        float w0 = BCP / triArea;
+                        float w1 = CAP / triArea;
+                        float w2 = ABP / triArea;
 
-                            Vector4 p = new(x, y, 0, 0);
-                            float ABP = EdgeFunction(a, b, p);
-                            float BCP = EdgeFunction(b, c, p);
-                            float CAP = EdgeFunction(c, a, p);
+                        float dist = w0 * a.Z + w1 * b.Z + w2 * c.Z;
+                        if (dist < values[x, y].distFromCam)
+                        {
+                            values[x, y].distFromCam = dist;
+                            float absABP = MathF.Abs(ABP);
+                            float absBCP = MathF.Abs(BCP);
+                            float absCAP = MathF.Abs(CAP);
+                            float nearest = MathF.Min(MathF.Min(absABP, absBCP), absCAP);
+                            float distOfNearest = float.NaN;
+                            if (nearest == absABP) { distOfNearest = Vector4.Distance(a, b); }
+                            else if (nearest == absBCP) { distOfNearest = Vector4.Distance(b, c); }
+                            else if (nearest == absCAP) { distOfNearest = Vector4.Distance(c, a); }
 
-                            if (ABP <= 1f && BCP <= 1f && CAP <= 1f)
-                            {
-                                float dist = a.Z * a.W + b.Z * b.W + c.Z * c.W;
-                                if (dist < values[x, y].distFromCam)
-                                {
-                                    values[x, y].distFromCam = dist;
-                                    float nearest = Math.Max(Math.Max(ABP, BCP), CAP);
-                                    float distOfNearest = float.NaN;
-                                    if (nearest == ABP) { distOfNearest = Vector4.Distance(a, b); }
-                                    else if (nearest == BCP) { distOfNearest = Vector4.Distance(b, c); }
-                                    else if (nearest == CAP) { distOfNearest = Vector4.Distance(c, a); }
-
-                                    values[x, y].strength = MathF.Pow((nearest * 2) / distOfNearest, 8) * 8;
-                                    values[x, y].color = vertices[0].col;
-                                }
-                            }
+                            values[x, y].strength = MathF.Pow((nearest * 2) / distOfNearest, 8) * 8;
+                            values[x, y].color = vertices[0].col;
+                        }
                     }
+                }
+            }
+        }
+
+
+        private static Vector4 ClipEdge(Vector4 front, Vector4 back, float near = 0.001f)
+        {
+            float t = (near - front.W) / (back.W - front.W);
+            return Vector4.Lerp(front, back, t);
+        }
+
+        public void DrawTriangle((Vector4 vec, ConsoleColor col)[] vertices)
+        {
+
+            //check for culling and stuff
+            bool[] behindOnes = new bool[vertices.Length];
+            int behindCount = 0;
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                vertices[i].vec = Vector4.Transform(vertices[i].vec, viewMatrix);
+                vertices[i].vec = Vector4.Transform(vertices[i].vec, projectionMatrix);
+                if (vertices[i].vec.W < 0.001f)
+                {
+                    behindCount++;
+                    behindOnes[i] = true;
+                } 
+            }
+            if (behindCount == 0) RasterizeClipSpaceTriangle(vertices);
+            else if (behindCount == 3) return;
+            else if (behindCount == 1)
+            {
+                Vector4 newA;
+                Vector4 newB;
+                if (behindOnes[0])
+                {
+                    newA = ClipEdge(vertices[1].vec, vertices[0].vec);
+                    newB = ClipEdge(vertices[2].vec, vertices[0].vec);
+                    RasterizeClipSpaceTriangle(vertices[1].vec, vertices[2].vec, newA, vertices[1].col);
+                    RasterizeClipSpaceTriangle(vertices[2].vec, newB, newA, vertices[1].col);
+                }
+                else if (behindOnes[1])
+                {
+                    newA = ClipEdge(vertices[0].vec, vertices[1].vec);
+                    newB = ClipEdge(vertices[2].vec, vertices[1].vec);
+                    RasterizeClipSpaceTriangle(vertices[0].vec, vertices[2].vec, newA, vertices[1].col);
+                    RasterizeClipSpaceTriangle(vertices[2].vec, newB, newA, vertices[1].col);
+                }
+                else if (behindOnes[2])
+                {
+                    newA = ClipEdge(vertices[0].vec, vertices[2].vec);
+                    newB = ClipEdge(vertices[1].vec, vertices[2].vec);
+                    RasterizeClipSpaceTriangle(vertices[0].vec, vertices[1].vec, newA, vertices[1].col);
+                    RasterizeClipSpaceTriangle(vertices[1].vec, newB, newA, vertices[1].col);
+                }
+                
+            }
+            else if (behindCount == 2)
+            {
+                Vector4 newA;
+                Vector4 newB;
+                int b0 = -1;
+                int b1 = -1;
+                int a = Array.FindIndex(behindOnes, x => x == false);
+                if (behindOnes[0])
+                {
+                    b0 = 0;
+                }
+                if (behindOnes[1])
+                {
+                    if (b0 == -1)
+                    {
+                        b0 = 1;
+                    }
+                    else
+                    {
+                        b1 = 1;
+                    }
+                }
+                if (behindOnes[2])
+                {
+                    b1 = 2;
+                }
+
+                newA = ClipEdge(vertices[a].vec, vertices[b0].vec);
+                newB = ClipEdge(vertices[a].vec, vertices[b1].vec);
+                RasterizeClipSpaceTriangle(vertices[a].vec, newA, newB, vertices[1].col);
             }
         }
 
@@ -161,35 +256,35 @@ namespace _3D_Console_Game
         {
             values = new (float strength, ConsoleColor color, float distFromCam)[values.GetLength(0), values.GetLength(1)];
 
-            if (elapsedTime -  lastPaletteSwapTime > 5)
-            {
-                lastPaletteSwapTime = elapsedTime;
-                Random rand = new Random();
+            //if (elapsedTime -  lastPaletteSwapTime > 5)
+            //{
+            //    lastPaletteSwapTime = elapsedTime;
+            //    Random rand = new Random();
 
-                palette[0] = (ConsoleColor)rand.Next(0, 15);
-                palette[1] = (ConsoleColor)rand.Next(0, 15);
-                while (palette[0] == ConsoleColor.Blue || palette[0] == ConsoleColor.Red || palette[0] == ConsoleColor.DarkBlue || palette[0] == ConsoleColor.DarkRed || palette[0] == ConsoleColor.DarkCyan || palette[0] == ConsoleColor.Cyan)
-                {
-                    palette[0] = (ConsoleColor)rand.Next(0, 15);
-                }
-                while (palette[1] == ConsoleColor.Blue || palette[1] == ConsoleColor.Red || palette[1] == ConsoleColor.DarkBlue || palette[1] == ConsoleColor.DarkRed || palette[1] == ConsoleColor.DarkCyan || palette[1] == ConsoleColor.Cyan)
-                {
-                    palette[1] = (ConsoleColor)rand.Next(0, 15);
-                }
-            }
+            //    palette[0] = (ConsoleColor)rand.Next(0, 15);
+            //    palette[1] = (ConsoleColor)rand.Next(0, 15);
+            //    while (palette[0] == ConsoleColor.Blue || palette[0] == ConsoleColor.Red || palette[0] == ConsoleColor.DarkBlue || palette[0] == ConsoleColor.DarkRed || palette[0] == ConsoleColor.DarkCyan || palette[0] == ConsoleColor.Cyan)
+            //    {
+            //        palette[0] = (ConsoleColor)rand.Next(0, 15);
+            //    }
+            //    while (palette[1] == ConsoleColor.Blue || palette[1] == ConsoleColor.Red || palette[1] == ConsoleColor.DarkBlue || palette[1] == ConsoleColor.DarkRed || palette[1] == ConsoleColor.DarkCyan || palette[1] == ConsoleColor.Cyan)
+            //    {
+            //        palette[1] = (ConsoleColor)rand.Next(0, 15);
+            //    }
+            //}
 
 
-            for (int x = 0; x < values.GetLength(0); x++)
-            {
-                for (int y = 0; y < values.GetLength(1); y++)
-                {
-                    int ux = x + (int)(MathF.Sin(elapsedTime) * 10);
-                    int uy = y + (int)(elapsedTime * 4 + 5 * MathF.Sin((float)ux / 6f + elapsedTime * 0.5f));
+            //for (int x = 0; x < values.GetLength(0); x++)
+            //{
+            //    for (int y = 0; y < values.GetLength(1); y++)
+            //    {
+            //        int ux = x + (int)(MathF.Sin(elapsedTime) * 10);
+            //        int uy = y + (int)(elapsedTime * 4 + 5 * MathF.Sin((float)ux / 6f + elapsedTime * 0.5f));
 
-                    bool cond = (uy % (5 + (int)(3 * MathF.Sin(elapsedTime * 0.6f + 2)))) == 0 && MathF.Sin(x * 0.2f + y * 0.3f + 40 * MathF.Sin(0.3f * elapsedTime + 1)) > MathF.Sin(elapsedTime * 0.72f);
-                    values[x,y].color = cond ? palette[0] : palette[1];
-                }
-            }
+            //        bool cond = (uy % (5 + (int)(3 * MathF.Sin(elapsedTime * 0.6f + 2)))) == 0 && MathF.Sin(x * 0.2f + y * 0.3f + 40 * MathF.Sin(0.3f * elapsedTime + 1)) > MathF.Sin(elapsedTime * 0.72f);
+            //        values[x, y].color = cond ? palette[0] : palette[1];
+            //    }
+            //}
 
             InitializeDepthBuffer();
         }
