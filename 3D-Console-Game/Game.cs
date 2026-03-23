@@ -13,7 +13,7 @@ namespace _3D_Console_Game
 
         public Player player = new Player();
 
-        List<Wall> activeWalls = new List<Wall>();
+        public static List<IDrawable> activeWalls = new List<IDrawable>();
         
         double timeCount = 30;
         int score = 0;
@@ -31,20 +31,15 @@ namespace _3D_Console_Game
 
                 if (timeCount > 3)
                 {
-                    activeWalls.Add(new Wall(1, new Vector3(0, 0, 0), new Vector3(1, 0, 0), ConsoleColor.Red));
-                    activeWalls.Add(new Wall(1, new Vector3(0, 0, 0), new Vector3(0, 1, 0), ConsoleColor.Green));
-                    activeWalls.Add(new Wall(1, new Vector3(0, 0, 0), new Vector3(0, 0, 1), ConsoleColor.Blue));
+                    activeWalls.Add(new Barrier(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0,1,0), new Vector3(1,1,0), ConsoleColor.Red));
+                    activeWalls.Add(new Barrier(new Vector3(1, 0, 0), new Vector3(1, 0, 1), new Vector3(1, 1, 0), new Vector3(1, 1, 1), ConsoleColor.Green));
+                    activeWalls.Add(new Barrier(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 0), new Vector3(0, 1, 1), ConsoleColor.Blue));
+                    activeWalls.Add(new Barrier(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(1, 0, 1), ConsoleColor.Black));
+                    activeWalls.Add(new Barrier(new Vector3(0, 1, 0), new Vector3(0, 1, 1), new Vector3(1, 1, 0), new Vector3(1, 1, 1), ConsoleColor.DarkGray));
+                    activeWalls.Add(new Barrier(new Vector3(2, 0, 1), new Vector3(2, 0, 0), new Vector3(2, 1, 1), new Vector3(2, 1, 0), ConsoleColor.DarkGray));
+                    activeWalls.Add(new Box(new Vector3(3, 0, 0), 3, 1, 4, ConsoleColor.Magenta));
                 }
-                foreach (var wall in activeWalls)
-                {
-                    if (wall.CollidesWith(player.hitbox))
-                    {
-                        state = GameState.Loss;
-                        activeWalls.Clear();
-                        break;
-                    }
-                }
-            
+
             }
             else if (state == GameState.Menu)
             {
@@ -83,7 +78,7 @@ namespace _3D_Console_Game
 
             if (state == GameState.inGame)
             {
-                foreach (Wall wall in activeWalls)
+                foreach (IDrawable wall in activeWalls)
                 {
                     Task.Run(() => wall.Draw(display));
                 }
