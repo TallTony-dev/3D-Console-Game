@@ -83,35 +83,32 @@ namespace _3D_Console_Game
             }
         }
 
+        public Prism actualHitbox 
+        { 
+            get 
+            {
+                Vector3 normal = Vector3.Normalize(Normal);
+                // Create thin slab: right = BottomRight, up = TopLeft, depth along normal with small thickness
+                Vector3 thicknessOffset = normal * 0.1f;
+                return new Prism(BottomLeft - thicknessOffset, BottomRight - thicknessOffset, TopLeft - thicknessOffset, BottomLeft + thicknessOffset);
+            } 
+        }
+
         /// <summary>
         /// Returns true on collision with Vector3 being the normal from surface
         /// </summary>
-        public (bool, Vector3) CollidesWith(Prism prism)
+        public (bool collides, Vector3 dirOut, float penetration) CollidesWith(Prism prism)
         {
             // first do aabbs cause its cheap relatively
             Prism aabb = AABB;
 
-            //TEMP: only use aabb for now
-            if (aabb.Intersects(prism))
+            if (!aabb.AABBIntersects(prism))
             {
-                return (true, GetNormalFromPoint(prism.MidPoint));
-            }
-
-
-            // then do point check to see if the points of rect are inside the prism
-            if (aabb.Contains(TopLeft) || aabb.Contains(TopRight) || aabb.Contains(BottomRight) || aabb.Contains(BottomLeft))
-            {
-                return (true, GetNormalFromPoint(prism.MidPoint));
+                return (false, Vector3.Zero, 0);
             }
 
             // then go to axis projection
-            
-
-           
-
-
-
-            return (false, Vector3.Zero);
+            return actualHitbox.SATCollision(prism);
         }
 
         public void Draw(Display display)
