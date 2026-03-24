@@ -16,6 +16,7 @@ namespace _3D_Console_Game
         float pitch;
         float roll = 0;
         float yaw = 0;
+        ConsoleColor col;
         protected Prism hitbox;
         public Prism AABB
         {
@@ -33,6 +34,7 @@ namespace _3D_Console_Game
             this.width = width;
             this.height = height;
             this.depth = length;
+            this.col = col;
             MidPoint = new Vector3(pos.X + width / 2, pos.Y + length / 2, pos.Z + width / 2);
             Vector3 pt1 = pos;
             Vector3 pt2 = pos + new Vector3(width, 0, 0);
@@ -67,6 +69,30 @@ namespace _3D_Console_Game
         {
             this.Pos = pos;
             hitbox.origin = pos;
+            RebuildBarriers();
+        }
+
+        private void RebuildBarriers()
+        {
+            Vector3 pos = Pos;
+            float length = depth;
+            Vector3 pt1 = pos;
+            Vector3 pt2 = pos + new Vector3(width, 0, 0);
+            Vector3 pt3 = pos + new Vector3(0, MathF.Sin(pitch) * length, length);
+            Vector3 pt4 = pos + new Vector3(width, MathF.Sin(pitch) * length, length);
+            Vector3 pt5 = pos + new Vector3(0, height, 0);
+            Vector3 pt6 = pos + new Vector3(width, height, 0);
+            Vector3 pt7 = pos + new Vector3(0, height + MathF.Sin(pitch) * length, length);
+            Vector3 pt8 = pos + new Vector3(width, height + MathF.Sin(pitch) * length, length);
+
+            barriers[0] = new Barrier(pt1, pt2, pt3, pt4, col);
+            barriers[1] = new Barrier(pt1, pt2, pt5, pt6, col);
+            barriers[2] = new Barrier(pt1, pt3, pt5, pt7, col);
+            barriers[3] = new Barrier(pt2, pt4, pt6, pt8, col);
+            barriers[4] = new Barrier(pt3, pt4, pt7, pt8, col);
+            barriers[5] = new Barrier(pt5, pt6, pt7, pt8, col);
+
+            MidPoint = new Vector3(pos.X + width / 2, pos.Y + depth / 2, pos.Z + width / 2);
         }
 
         public (bool collides, Vector3 dirOut, float penetration) CollidesWith(Prism prism)

@@ -17,7 +17,7 @@ namespace _3D_Console_Game
             {
                 double deltaTime = ((double)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000) - prevTime;
 
-                if (deltaTime >= 0.001)
+                if (deltaTime >= 0.01)
                 {
                     prevTime += deltaTime;
 

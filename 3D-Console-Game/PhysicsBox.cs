@@ -15,9 +15,10 @@ namespace _3D_Console_Game
         }
 
         private Vector3 velocity;
-        private float velocityRoll;
-        private float velocityPitch;
-        private float velocityYaw;
+
+        private const float Gravity = 8f;
+        private const float Friction = 2f;
+        private const float Bounciness = 1.8f;
 
         public void CollideWithPhysics(Vector3 forceDir, float strength)
         {
@@ -26,7 +27,21 @@ namespace _3D_Console_Game
 
         public void Update(double deltaTime)
         {
-            UpdatePos(velocity * (float)deltaTime, velocityRoll * (float)deltaTime, velocityPitch * (float)deltaTime, velocityYaw * (float)deltaTime);
+            float dt = (float)deltaTime;
+
+
+            velocity.Y -= Gravity * dt;
+            velocity.X -= Math.Sign(velocity.X) * Friction * dt;
+            velocity.Z -= Math.Sign(velocity.Z) * Friction * dt;
+
+            UpdatePos(Pos + velocity * dt);
+            CheckCollision();
+
+            if (Pos.Y < 0)
+            {
+                UpdatePos(Pos * new Vector3(1, 0, 1));
+                velocity.Y = 0;
+            }
         }
 
         private void CheckCollision()
@@ -47,9 +62,7 @@ namespace _3D_Console_Game
                         float velAlongNormal = Vector3.Dot(velocity, dirOut);
                         if (velAlongNormal < 0)
                         {
-                            //try bouncing too?
-                            float bounciness = 1.8f;
-                            velocity -= velAlongNormal * dirOut * bounciness;
+                            velocity -= velAlongNormal * dirOut * Bounciness;
                         }
                     }
                 }
