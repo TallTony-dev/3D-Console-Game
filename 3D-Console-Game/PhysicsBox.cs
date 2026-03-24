@@ -15,13 +15,21 @@ namespace _3D_Console_Game
         }
 
         private Vector3 velocity;
+        float velocityRoll;
+        float velocityPitch;
+        float velocityYaw;
 
         private const float Gravity = 8f;
         private const float Friction = 2f;
         private const float Bounciness = 1.8f;
 
-        public void CollideWithPhysics(Vector3 forceDir, float strength)
+        public void CollideWithPhysics(Vector3 forceDir, Vector3 forceSource, float strength)
         {
+            //theoretically dont need forcedir once you have forceSource here
+
+
+
+
             velocity += forceDir * strength;
         }
 
@@ -63,6 +71,11 @@ namespace _3D_Console_Game
                         if (velAlongNormal < 0)
                         {
                             velocity -= velAlongNormal * dirOut * Bounciness;
+                        }
+
+                        if (obj is PhysicsBox phys)
+                        {
+                            phys.CollideWithPhysics(-dirOut, hitbox.MidPoint, penetration * 100);
                         }
                     }
                 }
