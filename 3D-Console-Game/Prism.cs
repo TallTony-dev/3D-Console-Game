@@ -158,10 +158,37 @@ namespace _3D_Console_Game
 
         public bool AABBIntersects(Prism prism)
         {
-            return (prism.origin.X < origin.X + width && origin.X < prism.origin.X + prism.width
-                && prism.origin.Y < origin.Y + height && origin.Y < prism.origin.Y + prism.height
-                && prism.origin.Z < origin.Z + depth && origin.Z < prism.origin.Z + prism.depth);
+            // Compute actual axis-aligned bounding boxes from corners
+            // to handle rotated prisms correctly
+            (Vector3 minA, Vector3 maxA) = GetAABBMinMax();
+            (Vector3 minB, Vector3 maxB) = prism.GetAABBMinMax();
+
+            return (minA.X < maxB.X && minB.X < maxA.X
+                 && minA.Y < maxB.Y && minB.Y < maxA.Y
+                 && minA.Z < maxB.Z && minB.Z < maxA.Z);
         }
+
+        private (Vector3 min, Vector3 max) GetAABBMinMax()
+        {
+            Vector3 min = origin;
+            Vector3 max = origin;
+            Vector3[] offsets = { edgeRight, edgeUp, edgeDepth };
+
+            // The 8 corners are origin + every combination of 0/1 of the 3 edge vectors.
+            // Iterate all 7 non-zero combinations.
+            for (int i = 1; i < 8; i++)
+            {
+                Vector3 corner = origin;
+                if ((i & 1) != 0) corner += offsets[0];
+                if ((i & 2) != 0) corner += offsets[1];
+                if ((i & 4) != 0) corner += offsets[2];
+                min = Vector3.Min(min, corner);
+                max = Vector3.Max(max, corner);
+            }
+
+            return (min, max);
+        }
+
         public bool AABBContains(Vector3 point)
         {
             return (point.X < origin.X + width && origin.X < point.X

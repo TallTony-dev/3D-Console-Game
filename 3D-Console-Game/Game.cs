@@ -28,7 +28,7 @@ namespace _3D_Console_Game
                 display.Update(deltaTime, player);
                 player.Update(deltaTime);
 
-                foreach (IDrawable wall in activeWalls)
+                foreach (IDrawable wall in activeWalls.ToList())
                 {
                     if (wall is PhysicsBox phys)
                     {
@@ -40,14 +40,10 @@ namespace _3D_Console_Game
 
                 if (timeCount > 3)
                 {
-                    activeWalls.Add(new Barrier(new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(0,1,0), new Vector3(1,1,0), ConsoleColor.Red));
-                    activeWalls.Add(new Barrier(new Vector3(1, 0, 0), new Vector3(1, 0, 1), new Vector3(1, 1, 0), new Vector3(1, 1, 1), ConsoleColor.Green));
-                    activeWalls.Add(new Barrier(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 0), new Vector3(0, 1, 1), ConsoleColor.Blue));
-                    activeWalls.Add(new Barrier(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 0, 0), new Vector3(1, 0, 1), ConsoleColor.Black));
-                    activeWalls.Add(new Barrier(new Vector3(0, 1, 0), new Vector3(0, 1, 1), new Vector3(1, 1, 0), new Vector3(1, 1, 1), ConsoleColor.DarkGray));
-                    activeWalls.Add(new Barrier(new Vector3(2, 0, 1), new Vector3(2, 0, 0), new Vector3(2, 1, 1), new Vector3(2, 1, 0), ConsoleColor.DarkGray));
                     activeWalls.Add(new Box(new Vector3(3, 0, 0), 3, 1, 4, ConsoleColor.Magenta));
                     activeWalls.Add(new Box(new Vector3(-3, 0, 0), 3, 1, 4, ConsoleColor.Magenta, 0.785398f));
+                    activeWalls.Add(new PhysicsBox(new Vector3(0, 0, 2), 0.5f, 0.5f, 0.5f, ConsoleColor.Blue, 0.5f));
+                    timeCount = 0;
                 }
 
             }
@@ -90,7 +86,7 @@ namespace _3D_Console_Game
             {
                 foreach (IDrawable wall in activeWalls)
                 {
-                    Task.Run(() => wall.Draw(display));
+                    wall.Draw(display);
                 }
 
 

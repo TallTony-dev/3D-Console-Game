@@ -93,7 +93,7 @@ namespace _3D_Console_Game
                     {
                         if (obj is PhysicsBox phys)
                         {
-                            phys.CollideWithPhysics(-dirOut, penetration);
+                            phys.CollideWithPhysics(-dirOut, penetration * (float)deltaTime * 10000);
                         }
 
                         if (dirOut.Y > 0.7f)
