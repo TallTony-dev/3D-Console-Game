@@ -25,7 +25,7 @@ namespace _3D_Console_Game
         float yaw = 0f;
         float pitch = 0f;
         Vector3 camPos = Vector3.Zero;
-        Vector3 playerPos = new Vector3(7,0,0); 
+        Vector3 playerPos = new Vector3(0,0,0); 
         public Matrix4x4 ViewMatrix { 
             get {
                 // View matrix = inverse of camera transform
@@ -93,7 +93,7 @@ namespace _3D_Console_Game
                     {
                         if (obj is PhysicsBox phys)
                         {
-                            phys.CollideWithPhysics(-dirOut, penetration * (float)deltaTime * 10000);
+                            phys.CollideWithPhysics(-dirOut, hitbox.MidPoint, penetration * 100);
                         }
 
                         if (dirOut.Y > 0.7f)

@@ -42,8 +42,14 @@ namespace _3D_Console_Game
                 {
                     activeWalls.Add(new Box(new Vector3(3, 0, 0), 3, 1, 4, ConsoleColor.Magenta));
                     activeWalls.Add(new Box(new Vector3(-3, 0, 0), 3, 1, 4, ConsoleColor.Magenta, 0.785398f));
-                    activeWalls.Add(new PhysicsBox(new Vector3(0, 0, 2), 0.5f, 0.5f, 0.5f, ConsoleColor.Blue, 0.5f));
+                    for (int i = 0; i < 15; i++)
+                        activeWalls.Add(new PhysicsBox(new Vector3(i * 0.6f, i * 0.6f, -2), 0.5f, 0.5f, 0.5f, ConsoleColor.Blue, 0f));
                     timeCount = 0;
+                }
+                if (InputManager.IsKeyPressed(ConsoleKey.C))
+                {
+                    Random rand = new Random();
+                    activeWalls.Add(new PhysicsBox(new Vector3(-3 + rand.NextSingle() * 2, 5, 3), 0.5f, 0.5f, 0.5f, ConsoleColor.Yellow, 0f));
                 }
 
             }
