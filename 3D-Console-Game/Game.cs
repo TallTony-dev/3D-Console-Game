@@ -27,6 +27,15 @@ namespace _3D_Console_Game
                 InputManager.UpdateMousePos();
                 display.Update(deltaTime, player);
                 player.Update(deltaTime);
+
+                foreach (IDrawable wall in activeWalls)
+                {
+                    if (wall is PhysicsBox phys)
+                    {
+                        phys.Update(deltaTime);
+                    }
+                }
+
                 //timeCount += deltaTime;
 
                 if (timeCount > 3)
@@ -38,6 +47,7 @@ namespace _3D_Console_Game
                     activeWalls.Add(new Barrier(new Vector3(0, 1, 0), new Vector3(0, 1, 1), new Vector3(1, 1, 0), new Vector3(1, 1, 1), ConsoleColor.DarkGray));
                     activeWalls.Add(new Barrier(new Vector3(2, 0, 1), new Vector3(2, 0, 0), new Vector3(2, 1, 1), new Vector3(2, 1, 0), ConsoleColor.DarkGray));
                     activeWalls.Add(new Box(new Vector3(3, 0, 0), 3, 1, 4, ConsoleColor.Magenta));
+                    activeWalls.Add(new Box(new Vector3(-3, 0, 0), 3, 1, 4, ConsoleColor.Magenta, 0.785398f));
                 }
 
             }
