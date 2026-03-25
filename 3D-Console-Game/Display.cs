@@ -43,6 +43,7 @@ namespace _3D_Console_Game
             return "";
         }
 
+        public int fps;
 
         public ConsoleColor[] palette = { ConsoleColor.Black, ConsoleColor.DarkMagenta, ConsoleColor.DarkBlue };
 
@@ -347,6 +348,7 @@ namespace _3D_Console_Game
                 }
                 buf.AppendLine();
             }
+            buf.Append(fps.ToString());
 
             Console.SetCursorPosition(0, 0);
             Console.Write(buf.ToString());

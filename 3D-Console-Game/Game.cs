@@ -22,6 +22,7 @@ namespace _3D_Console_Game
         public void UpdateGame(double deltaTime)
         {
             InputManager.UpdateKey();
+            display.fps = (int)(1 / deltaTime);
             if (state == GameState.inGame)
             {
                 InputManager.UpdateMousePos();
@@ -41,9 +42,11 @@ namespace _3D_Console_Game
                 if (timeCount > 3)
                 {
                     activeWalls.Add(new Box(new Vector3(3, 0, 0), 3, 1, 4, ConsoleColor.Magenta));
-                    activeWalls.Add(new Box(new Vector3(-3, 0, 0), 3, 1, 4, ConsoleColor.Magenta, 0.785398f));
+                    activeWalls.Add(new Box(new Vector3(-3, 0, 0), 3, 1, 10, ConsoleColor.Magenta, -0.385398f));
                     for (int i = 0; i < 15; i++)
                         activeWalls.Add(new PhysicsBox(new Vector3(i * 0.6f, i * 0.6f, -2), 0.5f, 0.5f, 0.5f, ConsoleColor.Blue, 0f));
+                    activeWalls.Add(new Box(new Vector3(-1000, 0f, -1000), 2000, 0, 2000, ConsoleColor.White));
+                    //activeWalls.Add(new Barrier(new Vector3(-1000,0,-1000), new Vector3(1000, 0, -1000), new Vector3(-1000, 0, 1000), new Vector3(1000, 0, 1000), ConsoleColor.White));
                     timeCount = 0;
                 }
                 if (InputManager.IsKeyPressed(ConsoleKey.C))
