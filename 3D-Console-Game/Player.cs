@@ -73,6 +73,18 @@ namespace _3D_Console_Game
                 playerVel -= xzLeft * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzLeft)) + 0.1f);
             }
 
+            if (InputManager.IsCharPressedAsync('R'))
+            {
+                
+                ICollidable? c;
+                if ((c = Raycast.CastRay(camPos, forward, 1000)) != null) {
+                    if (c is PhysicsBox)
+                    {
+                        Game.activeWalls.Remove((IDrawable)c);
+
+                    }
+                }
+            }
 
             playerVel -= new Vector3(Math.Sign(playerVel.X) * 2f * dt, dt * 8, Math.Sign(playerVel.Z) * 2f * dt);
             playerPos += Vector3.Multiply((float)deltaTime, playerVel);
@@ -88,12 +100,12 @@ namespace _3D_Console_Game
             {
                 if (obj is ICollidable collidable)
                 {
-                    (bool collides, Vector3 dirOut, float penetration) = collidable.CollidesWith(Hitbox);
+                    (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = collidable.CollidesWith(Hitbox);
                     if (collides)
                     {
                         if (obj is PhysicsBox phys)
                         {
-                            phys.CollideWithPhysics(-dirOut, hitbox.MidPoint, penetration * 100);
+                            phys.CollideWithPhysics(-dirOut, penetration * 100, collisionPoint);
                         }
 
                         if (dirOut.Y > 0.7f)

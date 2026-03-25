@@ -12,9 +12,8 @@ namespace _3D_Console_Game
         /// <summary>
         /// Returns true on collision with Vector3 being the normal from surface
         /// </summary>
-        public (bool collides, Vector3 dirOut, float penetration) CollidesWith(Prism prism);
+        public (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) CollidesWith(Prism prism);
 
         public Vector3 MidPoint { get; }
-        public Prism AABB { get; }
     }
 }

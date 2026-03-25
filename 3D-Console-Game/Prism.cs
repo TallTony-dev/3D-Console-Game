@@ -15,7 +15,7 @@ namespace _3D_Console_Game
         public float depth;
         public Quaternion rot = Quaternion.Identity;
 
-        // Edge vectors from origin (supports sheared geometry)
+        //edge vectors from origin
         private Vector3 edgeRight;
         private Vector3 edgeUp;
         private Vector3 edgeDepth;
@@ -81,7 +81,7 @@ namespace _3D_Console_Game
         }
 
 
-        public (bool collides, Vector3 dirOut, float penetration) SATCollision(Prism b)
+        public (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) SATCollision(Prism b)
         {
             Vector3[] cornersA = { FrontBottomLeft, FrontBottomRight, FrontTopLeft, FrontTopRight, BackBottomLeft, BackBottomRight, BackTopLeft, BackTopRight };
             Vector3[] cornersB = { b.FrontBottomLeft, b.FrontBottomRight, b.FrontTopLeft, b.FrontTopRight, b.BackBottomLeft, b.BackBottomRight, b.BackTopLeft, b.BackTopRight };
@@ -96,13 +96,13 @@ namespace _3D_Console_Game
             axes[4] = Vector3.Cross(b.edgeDepth, b.edgeRight);
             axes[5] = Vector3.Cross(b.edgeRight, b.edgeUp);
 
-            // Edge-edge cross products
             Vector3[] edgesA = { edgeRight, edgeUp, edgeDepth };
             Vector3[] edgesB = { b.edgeRight, b.edgeUp, b.edgeDepth };
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
+                    // other edges too on the outside of cubes
                     axes[6 + i * 3 + j] = Vector3.Cross(edgesA[i], edgesB[j]);
                 }
             }
@@ -138,7 +138,7 @@ namespace _3D_Console_Game
                 float overlap = Math.Min(maxA - minB, maxB - minA);
 
                 if (overlap <= 0) 
-                    return (false, Vector3.Zero, 0);
+                    return (false, Vector3.Zero, 0, Vector3.Zero);
 
                 if (overlap < smallestOverlap)
                 {
@@ -153,7 +153,38 @@ namespace _3D_Console_Game
                 axes[smallestOverlapAxis] = -axes[smallestOverlapAxis];
             }
 
-            return (true, Vector3.Normalize(axes[smallestOverlapAxis]), smallestOverlap);
+            // LLLM SLOP:
+            // Compute collision point: average the corners of B that penetrate deepest into A along the MTV axis
+            Vector3 mtv = axes[smallestOverlapAxis];
+            Vector3 collisionPoint = Vector3.Zero;
+            int count = 0;
+            float threshold = smallestOverlap * 0.5f;
+
+            // Project all of B's corners onto the MTV axis and find those within the overlap region
+            float refProj = float.MaxValue;
+            for (int c = 0; c < 8; c++)
+            {
+                float proj = Vector3.Dot(cornersB[c], mtv);
+                if (proj < refProj) refProj = proj;
+            }
+
+            for (int c = 0; c < 8; c++)
+            {
+                float proj = Vector3.Dot(cornersB[c], mtv);
+                // Corners near the leading edge of B (deepest into A)
+                if (proj - refProj < threshold)
+                {
+                    collisionPoint += cornersB[c];
+                    count++;
+                }
+            }
+
+            if (count > 0)
+                collisionPoint /= count;
+            else
+                collisionPoint = (this.MidPoint + b.MidPoint) * 0.5f;
+
+            return (true, Vector3.Normalize(mtv), smallestOverlap, collisionPoint);
         }
 
         public bool AABBIntersects(Prism prism)
@@ -191,9 +222,10 @@ namespace _3D_Console_Game
 
         public bool AABBContains(Vector3 point)
         {
-            return (point.X < origin.X + width && origin.X < point.X
-                && point.Y < origin.Y + height && origin.Y < point.Y
-                && point.Z < origin.Z + depth && origin.Z < point.Z);
+            (Vector3 min, Vector3 max) = GetAABBMinMax();
+            return (point.X < max.X && min.X < point.X
+                && point.Y < max.Y && min.Y < point.Y
+                && point.Z < max.Z && min.Z < point.Z);
         }
     }
 }

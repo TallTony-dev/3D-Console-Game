@@ -97,14 +97,14 @@ namespace _3D_Console_Game
         /// <summary>
         /// Returns true on collision with Vector3 being the normal from surface
         /// </summary>
-        public (bool collides, Vector3 dirOut, float penetration) CollidesWith(Prism prism)
+        public (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) CollidesWith(Prism prism)
         {
             // first do aabbs cause its cheap relatively
             Prism aabb = AABB;
 
             if (!aabb.AABBIntersects(prism))
             {
-                return (false, Vector3.Zero, 0);
+                return (false, Vector3.Zero, 0, Vector3.Zero);
             }
 
             // then go to axis projection
