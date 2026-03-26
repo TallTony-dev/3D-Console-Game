@@ -42,7 +42,9 @@ namespace _3D_Console_Game
             } 
         }
 
-        float moveSpeed = 5f;
+        Box? heldBox;
+
+        float moveSpeed = 9f;
         float rotSpeed = 2f;
 
         Vector3 playerVel;
@@ -78,17 +80,22 @@ namespace _3D_Console_Game
             if (InputManager.IsCharPressedAsync('R'))
             {
                 Vector3 camPoss = camPos + Forward;
-                ParticleManager.AddParticle(new Particle(0.5f, new Box(camPoss, 0.1f, 0.1f, 1f, ConsoleColor.Red, Forward), Forward * 30));
-                List<ICollidable> clist = Raycast.CastRay(camPoss, Forward, 1000);
-                foreach (ICollidable c in clist) {
-                    if (c is PhysicsBox)
+                ParticleManager.AddParticle(new Bullet(6f, 10, 4, camPoss, Forward, ConsoleColor.Blue));
+
+            }
+
+            if (InputManager.IsKeyPressed(ConsoleKey.E))
+            {
+                if (heldBox == null) { 
+                    ICollidable? c = Raycast.GetFirstObject(camPos, Forward, 1);
+                    if (c is Box b && b.isPickable)
                     {
-                        Game.activeWalls.Remove((IDrawable)c);
+                        heldBox = b;
                     }
-                    else if (c is IDamagable damagable)
-                    {
-                        damagable.TakeDamage(10);
-                    }
+                }
+                else
+                {
+                    heldBox = null;
                 }
             }
 
@@ -101,10 +108,15 @@ namespace _3D_Console_Game
                 playerVel.Y = 0;
             }
 
-            Prism hitbox = Hitbox;
-            foreach (object obj in Game.activeWalls)
+            if (heldBox != null)
             {
-                if (obj is ICollidable collidable)
+                heldBox.SetPos(camPos + (heldBox.Pos - heldBox.MidPoint) + Forward, -MathF.Asin(Forward.Y), 0, MathF.Atan2(Forward.X, Forward.Z));
+            }
+
+            Prism hitbox = Hitbox;
+            foreach (object obj in Game.activeDrawables)
+            {
+                if (obj is ICollidable collidable && obj != heldBox)
                 {
                     (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = collidable.CollidesWith(Hitbox);
                     if (collides)

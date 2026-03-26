@@ -73,7 +73,7 @@ namespace _3D_Console_Game
 
         private void CheckCollision()
         {
-            foreach (object obj in Game.activeWalls)
+            foreach (object obj in Game.activeDrawables)
             {
                 if (obj is ICollidable collidable && obj != this && !(obj is Enemy enemy && enemy.Body == this))
                 {

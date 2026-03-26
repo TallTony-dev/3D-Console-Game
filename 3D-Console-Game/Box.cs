@@ -18,7 +18,9 @@ namespace _3D_Console_Game
         protected float yaw { get; private set; }
 
         public ConsoleColor col;
-        protected Prism hitbox;
+        public Prism hitbox { get; protected set; }
+
+        public bool isPickable = false;
 
         public Box(Vector3 pos, float width, float height, float length, ConsoleColor col, float pitch = 0, float roll = 0, float yaw = 0)
         {
@@ -72,6 +74,16 @@ namespace _3D_Console_Game
         {
             this.Pos = pos;
             hitbox.origin = pos;
+            RebuildBarriers();
+        }
+
+        public void SetPos(Vector3 pos, float pitch, float roll, float yaw)
+        {
+            this.Pos = pos;
+            hitbox.origin = pos;
+            this.roll = roll;
+            this.pitch = pitch;
+            this.yaw = yaw;
             RebuildBarriers();
         }
 

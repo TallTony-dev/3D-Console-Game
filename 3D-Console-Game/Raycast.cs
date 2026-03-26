@@ -14,7 +14,7 @@ namespace _3D_Console_Game
         {
             List<ICollidable> result = new List<ICollidable>();
 
-            foreach (ICollidable obj in Game.activeWalls)
+            foreach (ICollidable obj in Game.activeDrawables)
             {
                 if (obj.CollidesWith(new Prism(origin,origin, origin + direction * dist, origin + direction * dist)).collides)
                 {
@@ -24,6 +24,26 @@ namespace _3D_Console_Game
             return result;
         }
 
+        public static ICollidable ?GetFirstObject(Vector3 origin, Vector3 direction, float dist)
+        {
+            ICollidable ?closest = null;
+            float closestDist = float.MaxValue;
+
+            foreach (ICollidable obj in Game.activeDrawables)
+            {
+                (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = obj.CollidesWith(new Prism(origin, origin, origin + direction * dist, origin + direction * dist));
+                if (collides)
+                {
+                    float distance = (obj.MidPoint - origin).Length();
+                    if (distance < closestDist)
+                    {
+                        closestDist = distance;
+                        closest = obj;
+                    }
+                }
+            }
+            return closest;
+        }
 
     }
 }
