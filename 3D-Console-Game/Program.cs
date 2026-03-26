@@ -5,13 +5,13 @@ namespace _3D_Console_Game
 {
     internal class Program
     {
+        public static Game game = new Game();
         static void Main(string[] args)
         {
             double prevTime = (double)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000;
 
-            Game game = new Game();
-
             Console.CursorVisible = false;
+            game.InitializeGame();
 
             while (true)
             {

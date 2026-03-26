@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace _3D_Console_Game
 {
-    internal class Player
+    internal class Player : IUpdatable
     {
         float width = 0.8f;
         float height = 2;
@@ -21,6 +21,10 @@ namespace _3D_Console_Game
                 return new Prism(pos, width, height, depth);
             }
         }
+        public Vector3 Forward { get { return Vector3.Transform(-Vector3.UnitZ, view); } }
+        public Vector3 Left { get { return Vector3.Transform(-Vector3.UnitX, view); } }
+
+
         Quaternion view = Quaternion.Identity;
         float yaw = 0f;
         float pitch = 0f;
@@ -46,11 +50,9 @@ namespace _3D_Console_Game
         public void Update(double deltaTime)
         {
             float dt = (float)deltaTime;
-            Vector3 forward = Vector3.Transform(-Vector3.UnitZ, view);
-            Vector3 left = Vector3.Transform(-Vector3.UnitX, view);
 
-            Vector3 xzForward = Vector3.Normalize(forward * new Vector3(1, 0, 1));
-            Vector3 xzLeft = Vector3.Normalize(left * new Vector3(1, 0, 1));
+            Vector3 xzForward = Vector3.Normalize(Forward * new Vector3(1, 0, 1));
+            Vector3 xzLeft = Vector3.Normalize(Left * new Vector3(1, 0, 1));
 
             bool isTouchingGround = playerPos.Y == 0;
 
@@ -75,13 +77,17 @@ namespace _3D_Console_Game
 
             if (InputManager.IsCharPressedAsync('R'))
             {
-                
-                ICollidable? c;
-                if ((c = Raycast.CastRay(camPos, forward, 1000)) != null) {
+                Vector3 camPoss = camPos + Forward;
+                ParticleManager.AddParticle(new Particle(0.5f, new Box(camPoss, 0.1f, 0.1f, 1f, ConsoleColor.Red, Forward), Forward * 30));
+                List<ICollidable> clist = Raycast.CastRay(camPoss, Forward, 1000);
+                foreach (ICollidable c in clist) {
                     if (c is PhysicsBox)
                     {
                         Game.activeWalls.Remove((IDrawable)c);
-
+                    }
+                    else if (c is IDamagable damagable)
+                    {
+                        damagable.TakeDamage(10);
                     }
                 }
             }

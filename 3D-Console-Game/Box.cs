@@ -17,7 +17,7 @@ namespace _3D_Console_Game
         protected float roll { get; private set; }
         protected float yaw { get; private set; }
 
-        ConsoleColor col;
+        public ConsoleColor col;
         protected Prism hitbox;
 
         public Box(Vector3 pos, float width, float height, float length, ConsoleColor col, float pitch = 0, float roll = 0, float yaw = 0)
@@ -34,7 +34,14 @@ namespace _3D_Console_Game
             RebuildBarriers();
         }
 
-        protected void UpdatePos(Vector3 deltaPos, float deltaRoll, float deltaPitch, float deltaYaw)
+        public Box(Vector3 pos, float width, float height, float length, ConsoleColor col, Vector3 dir) :
+            this(pos, width, height, length, col, -MathF.Asin(dir.Y), 0, MathF.Atan2(dir.X, dir.Z))
+        {
+
+        }
+
+
+        public void UpdatePos(Vector3 deltaPos, float deltaRoll = 0, float deltaPitch = 0, float deltaYaw = 0)
         {
             Pos += deltaPos;
             roll += deltaRoll;
@@ -43,7 +50,25 @@ namespace _3D_Console_Game
             hitbox = new Prism(Pos, width, height, depth, roll, pitch, yaw);
             RebuildBarriers();
         }
-        protected void UpdatePos(Vector3 pos)
+
+        public void UpdateSize(float deltaWidth, float deltaHeight, float deltaDepth)
+        {
+            width += deltaWidth;
+            height += deltaHeight;
+            depth += deltaDepth;
+            hitbox = new Prism(Pos, width, height, depth, roll, pitch, yaw);
+            RebuildBarriers();
+        }
+        public void SetSize(float width, float height, float depth)
+        {
+            this.width = width;
+            this.height = height;
+            this.depth = depth;
+            hitbox = new Prism(Pos, width, height, depth, roll, pitch, yaw);
+            RebuildBarriers();
+        }
+
+        public void SetPos(Vector3 pos)
         {
             this.Pos = pos;
             hitbox.origin = pos;
