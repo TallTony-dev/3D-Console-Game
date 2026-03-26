@@ -15,10 +15,23 @@ namespace _3D_Console_Game
 
         public static List<IDrawable> activeWalls = new List<IDrawable>();
         
-        double timeCount = 30;
         int score = 0;
 
         GameState state = GameState.Menu;
+
+
+        public void InitializeGame()
+        {
+            activeWalls.Add(new Box(new Vector3(3, 0, 0), 3, 1, 4, ConsoleColor.Magenta));
+            activeWalls.Add(new Box(new Vector3(-3, 0, 0), 3, 1, 10, ConsoleColor.Magenta, -0.385398f));
+            for (int i = 0; i < 15; i++)
+                activeWalls.Add(new PhysicsBox(new Vector3(i * 0.6f, i * 0.6f, -2), 0.5f, 0.5f, 0.5f, ConsoleColor.Blue, 0f));
+            activeWalls.Add(new Box(new Vector3(-1000, 0f, -1000), 2000, 0, 2000, ConsoleColor.White));
+            //activeWalls.Add(new Barrier(new Vector3(-1000,0,-1000), new Vector3(1000, 0, -1000), new Vector3(-1000, 0, 1000), new Vector3(1000, 0, 1000), ConsoleColor.White));
+            activeWalls.Add(new Slime(new Vector3(1, 10f, 0)));
+        }
+
+
         public void UpdateGame(double deltaTime)
         {
             InputManager.UpdateKey();
@@ -28,27 +41,16 @@ namespace _3D_Console_Game
                 InputManager.UpdateMousePos();
                 display.Update(deltaTime, player);
                 player.Update(deltaTime);
+                ParticleManager.UpdateParticles(deltaTime);
 
-                foreach (IDrawable wall in activeWalls.ToList())
+                foreach (IDrawable obj in activeWalls.ToList())
                 {
-                    if (wall is PhysicsBox phys)
+                    if (obj is IUpdatable updatable)
                     {
-                        phys.Update(deltaTime);
+                        updatable.Update(deltaTime);
                     }
                 }
 
-                //timeCount += deltaTime;
-
-                if (timeCount > 3)
-                {
-                    activeWalls.Add(new Box(new Vector3(3, 0, 0), 3, 1, 4, ConsoleColor.Magenta));
-                    activeWalls.Add(new Box(new Vector3(-3, 0, 0), 3, 1, 10, ConsoleColor.Magenta, -0.385398f));
-                    for (int i = 0; i < 15; i++)
-                        activeWalls.Add(new PhysicsBox(new Vector3(i * 0.6f, i * 0.6f, -2), 0.5f, 0.5f, 0.5f, ConsoleColor.Blue, 0f));
-                    activeWalls.Add(new Box(new Vector3(-1000, 0f, -1000), 2000, 0, 2000, ConsoleColor.White));
-                    //activeWalls.Add(new Barrier(new Vector3(-1000,0,-1000), new Vector3(1000, 0, -1000), new Vector3(-1000, 0, 1000), new Vector3(1000, 0, 1000), ConsoleColor.White));
-                    timeCount = 0;
-                }
                 if (InputManager.IsKeyPressed(ConsoleKey.C))
                 {
                     Random rand = new Random();
@@ -97,7 +99,7 @@ namespace _3D_Console_Game
                 {
                     wall.Draw(display);
                 }
-
+                ParticleManager.DrawParticles(display);
 
                 display.DrawGameToConsole(score);
                 display.Clear();
