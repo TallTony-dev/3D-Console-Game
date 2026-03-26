@@ -13,7 +13,7 @@ namespace _3D_Console_Game
 
         public Player player = new Player();
 
-        public static List<IDrawable> activeWalls = new List<IDrawable>();
+        public static List<IDrawable> activeDrawables = new List<IDrawable>();
         
         int score = 0;
 
@@ -22,13 +22,13 @@ namespace _3D_Console_Game
 
         public void InitializeGame()
         {
-            activeWalls.Add(new Box(new Vector3(3, 0, 0), 3, 1, 4, ConsoleColor.Magenta));
-            activeWalls.Add(new Box(new Vector3(-3, 0, 0), 3, 1, 10, ConsoleColor.Magenta, -0.385398f));
+            activeDrawables.Add(new Box(new Vector3(3, 0, 0), 3, 1, 4, ConsoleColor.Magenta));
+            activeDrawables.Add(new Box(new Vector3(-3, 0, 0), 3, 1, 10, ConsoleColor.Magenta, -0.385398f));
             for (int i = 0; i < 15; i++)
-                activeWalls.Add(new PhysicsBox(new Vector3(i * 0.6f, i * 0.6f, -2), 0.5f, 0.5f, 0.5f, ConsoleColor.Blue, 0f));
-            activeWalls.Add(new Box(new Vector3(-1000, 0f, -1000), 2000, 0, 2000, ConsoleColor.White));
-            //activeWalls.Add(new Barrier(new Vector3(-1000,0,-1000), new Vector3(1000, 0, -1000), new Vector3(-1000, 0, 1000), new Vector3(1000, 0, 1000), ConsoleColor.White));
-            activeWalls.Add(new Slime(new Vector3(1, 10f, 0)));
+                activeDrawables.Add(new PhysicsBox(new Vector3(i * 0.6f, i * 0.6f, -2), 0.5f, 0.5f, 0.5f, ConsoleColor.Blue, 0f) { isPickable = true });
+            activeDrawables.Add(new Box(new Vector3(-1000, 0f, -1000), 2000, 0, 2000, ConsoleColor.White));
+            //activeDrawables.Add(new Barrier(new Vector3(-1000,0,-1000), new Vector3(1000, 0, -1000), new Vector3(-1000, 0, 1000), new Vector3(1000, 0, 1000), ConsoleColor.White));
+            activeDrawables.Add(new Slime(new Vector3(1, 4f, 0)));
         }
 
 
@@ -43,7 +43,7 @@ namespace _3D_Console_Game
                 player.Update(deltaTime);
                 ParticleManager.UpdateParticles(deltaTime);
 
-                foreach (IDrawable obj in activeWalls.ToList())
+                foreach (IDrawable obj in activeDrawables.ToList())
                 {
                     if (obj is IUpdatable updatable)
                     {
@@ -54,7 +54,11 @@ namespace _3D_Console_Game
                 if (InputManager.IsKeyPressed(ConsoleKey.C))
                 {
                     Random rand = new Random();
-                    activeWalls.Add(new PhysicsBox(new Vector3(-3 + rand.NextSingle() * 2, 5, 3), 0.5f, 0.5f, 0.5f, ConsoleColor.Yellow, 0f));
+                    activeDrawables.Add(new PhysicsBox(new Vector3(-3 + rand.NextSingle() * 2, 5, 3), 0.5f, 0.5f, 0.5f, ConsoleColor.Yellow, 0f) { isPickable = true });
+                }
+                if (InputManager.IsKeyPressed(ConsoleKey.F))
+                {
+                    activeDrawables.Add(new Slime(new Vector3(1, 4f, 0)));
                 }
 
             }
@@ -95,7 +99,7 @@ namespace _3D_Console_Game
 
             if (state == GameState.inGame)
             {
-                foreach (IDrawable wall in activeWalls)
+                foreach (IDrawable wall in activeDrawables)
                 {
                     wall.Draw(display);
                 }

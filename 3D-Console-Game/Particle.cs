@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace _3D_Console_Game
 {
-    internal class Particle : IUpdatable
+    internal class Particle : IUpdatable, IDrawable
     {
 
         public float timeLeft;
         Vector3 velocity;
-        Box box;
+        protected Box box;
 
         public Particle(float duration, Box box, Vector3 velocity)
         {
@@ -21,7 +21,7 @@ namespace _3D_Console_Game
             this.velocity = velocity;
         }
 
-        public void Update(double dt)
+        public virtual void Update(double dt)
         {
             box.UpdatePos(velocity * (float)dt);
         }

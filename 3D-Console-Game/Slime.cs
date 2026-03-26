@@ -28,7 +28,7 @@ namespace _3D_Console_Game
         public override void Update(double dt)
         {
             animTime += (float)dt;
-            if (timeSinceTakenDamage < 1)
+            if (timeSinceTakenDamage < 0.1f)
             {
                 body.col = ConsoleColor.Red;
             }
@@ -45,7 +45,7 @@ namespace _3D_Console_Game
             if (animTime > 3 && animTime < 4)
             {
                 Vector3 left = player.Left;
-                body.velocity = 5 * left * (float)Math.Sin(animTime * 25) + new Vector3(0,body.velocity.Y, 0);
+                body.velocity = 5 * left * (float)Math.Sin(animTime * 35) + new Vector3(0,body.velocity.Y, 0);
             }
             if (animTime > 3.5)
             {

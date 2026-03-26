@@ -15,5 +15,6 @@ namespace _3D_Console_Game
         public (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) CollidesWith(Prism prism);
 
         public Vector3 MidPoint { get; }
+        
     }
 }
