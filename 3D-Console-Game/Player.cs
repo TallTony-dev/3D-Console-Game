@@ -23,7 +23,7 @@ namespace _3D_Console_Game
         }
         public Vector3 Forward { get { return Vector3.Transform(-Vector3.UnitZ, view); } }
         public Vector3 Left { get { return Vector3.Transform(-Vector3.UnitX, view); } }
-
+        List<object> collidedObjects = new();
 
         Quaternion view = Quaternion.Identity;
         float yaw = 0f;
@@ -44,20 +44,56 @@ namespace _3D_Console_Game
 
         Box? heldBox;
 
-        float moveSpeed = 9f;
-        float rotSpeed = 2f;
+        float moveSpeed;
+        float rotSpeed;
 
         Vector3 playerVel;
 
+        public float health { get; private set; }
+
+        public Player(float health, float width = 0.5f, float height = 1.5f, float depth = 0.5f, Vector3 playerPos = default, float moveSpeed = 9f, float rotSpeed = 2f)
+        {
+            this.width = width;
+            this.height = height;
+            this.depth = depth;
+            this.playerPos = playerPos;
+            this.moveSpeed = moveSpeed;
+            this.rotSpeed = rotSpeed;
+            this.health = health;
+        }
+
+        float timeSinceDamageTaken = 10;
+        public void TakeDamage(float damage, Vector3 sourcePos)
+        {
+            if (timeSinceDamageTaken > 0.5f)
+            {
+                health -= damage;
+                Vector3 knockback = sourcePos - playerPos;
+                if (knockback.LengthSquared() > 0.0001f)
+                {
+                    playerVel -= Vector3.Normalize(knockback) * 4;
+                }
+                timeSinceDamageTaken = 0;
+            }
+        }
+
+        public bool ObjectCollidedWithPlayer(object obj)
+        {
+            return collidedObjects.Contains(obj);
+        }
+
         public void Update(double deltaTime)
         {
+            collidedObjects.Clear();
             float dt = (float)deltaTime;
 
-            Vector3 xzForward = Vector3.Normalize(Forward * new Vector3(1, 0, 1));
-            Vector3 xzLeft = Vector3.Normalize(Left * new Vector3(1, 0, 1));
+            Vector3 xzForwardRaw = Forward * new Vector3(1, 0, 1);
+            Vector3 xzForward = xzForwardRaw.LengthSquared() > 0.0001f ? Vector3.Normalize(xzForwardRaw) : Vector3.UnitZ;
+            Vector3 xzLeftRaw = Left * new Vector3(1, 0, 1);
+            Vector3 xzLeft = xzLeftRaw.LengthSquared() > 0.0001f ? Vector3.Normalize(xzLeftRaw) : Vector3.UnitX;
 
             bool isTouchingGround = playerPos.Y == 0;
-
+            timeSinceDamageTaken += dt;
             
 
             if (InputManager.IsCharPressedAsync('W'))
@@ -80,7 +116,7 @@ namespace _3D_Console_Game
             if (InputManager.IsCharPressedAsync('R'))
             {
                 Vector3 camPoss = camPos + Forward;
-                ParticleManager.AddParticle(new Bullet(6f, 10, 4, camPoss, Forward, ConsoleColor.Blue));
+                ParticleManager.AddParticle(new Bullet(6f, 10, 4, camPoss, Forward, ConsoleColor.Green, false, true));
 
             }
 
@@ -114,13 +150,15 @@ namespace _3D_Console_Game
             }
 
             Prism hitbox = Hitbox;
-            foreach (object obj in Game.activeDrawables)
+            foreach (object obj in Game.activeObjects)
             {
                 if (obj is ICollidable collidable && obj != heldBox)
                 {
                     (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = collidable.CollidesWith(Hitbox);
                     if (collides)
                     {
+                        collidedObjects.Add(obj);
+
                         if (obj is PhysicsBox phys)
                         {
                             phys.CollideWithPhysics(-dirOut, penetration * 100, collisionPoint);
@@ -133,7 +171,7 @@ namespace _3D_Console_Game
 
                         if (penetration > 0)
                         {
-                            playerPos += dirOut * (penetration + 0.001f);
+                            playerPos += dirOut * (penetration);
                         }
 
                         // Remove velocity component along the resolution direction

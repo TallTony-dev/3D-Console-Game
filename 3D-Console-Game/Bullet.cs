@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _3D_Console_Game.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -10,22 +11,39 @@ namespace _3D_Console_Game
     internal class Bullet : Particle
     {
         float damage = 0;
-        public Bullet(float duration, float damage, float velocity, Vector3 pos, Vector3 dir, ConsoleColor col, float width = 0.1f, float height = 0.1f, float length = 0.3f) : base(duration, new Box(pos, width, height, length, col, dir), velocity * dir)
+        bool hitsEnemies;
+        bool hitsPlayer;
+        public Bullet(float duration, float damage, float velocity, Vector3 pos, Vector3 dir, ConsoleColor col, bool hitsPlayer, bool hitsEnemies, float width = 0.1f, float height = 0.1f, float length = 0.3f) : base(duration, new Box(pos, width, height, length, col, dir), velocity * dir)
         {
             this.damage = damage;
+            this.hitsPlayer = hitsPlayer;
+            this.hitsEnemies = hitsEnemies;
         }
 
         public override void Update(double dt)
         {
             base.Update(dt);
-            foreach (object obj in Game.activeDrawables)
+
+            foreach (object obj in Game.activeObjects)
             {
-                if (obj is ICollidable collidable && obj is IDamagable damagable)
+                if ((obj is Player p && hitsPlayer))
                 {
-                    (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = collidable.CollidesWith(box.hitbox);
+                    (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = box.CollidesWith(p.Hitbox);
                     if (collides)
                     {
-                        damagable.TakeDamage(damage);
+                        p.TakeDamage(damage, collisionPoint);
+                        timeLeft = -1;
+                        return;
+                    }
+                }
+
+                if ((obj is Entity e && hitsEnemies && obj is Enemy))
+                {
+
+                    (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = e.CollidesWith(box.hitbox);
+                    if (collides)
+                    {
+                        e.TakeDamage(damage, collisionPoint);
                         timeLeft = -1;
                         return;
                     }

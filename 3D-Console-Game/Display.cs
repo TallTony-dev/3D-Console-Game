@@ -252,7 +252,6 @@ namespace _3D_Console_Game
             }
         }
 
-        float lastPaletteSwapTime = 0;
         public void Clear()
         {
             values = new (float strength, ConsoleColor color, float distFromCam)[values.GetLength(0), values.GetLength(1)];
@@ -312,6 +311,8 @@ namespace _3D_Console_Game
             StringBuilder buf = new StringBuilder();
             (char c, ConsoleColor col)[,] display = new (char, ConsoleColor)[values.GetLength(0), values.GetLength(1)];
 
+            Hudstuff.HUD.DrawHUD(display);
+
             float maxDist = 0;
             for (int x = 0; x < values.GetLength(0); x++)
             {
@@ -327,13 +328,15 @@ namespace _3D_Console_Game
             {
                 for (int y = 0; y < values.GetLength(1); y++)
                 {
-                    (float strength, ConsoleColor color, float distFromCam) value = values[x, y];
-                    if (maxDist == 0 || value.distFromCam == float.MaxValue)
-                        display[x, y].c = MapToChar(0);
-                    else
-                        display[x, y].c = MapToChar(((value.distFromCam / maxDist) + value.strength) / 2);
-                    display[x, y].col = value.color;
-
+                    if (display[x, y] == default)
+                    {
+                        (float strength, ConsoleColor color, float distFromCam) value = values[x, y];
+                        if (maxDist == 0 || value.distFromCam == float.MaxValue)
+                            display[x, y].c = MapToChar(0);
+                        else
+                            display[x, y].c = MapToChar(((value.distFromCam / maxDist) + value.strength) / 2);
+                        display[x, y].col = value.color;
+                    }
                 }
             }
 
@@ -341,7 +344,8 @@ namespace _3D_Console_Game
             {
                 for (int x = 0; x < display.GetLength(0); x++)
                 {
-
+                    if (display[x, y].c < 176)
+                        buf.Append($"{ESC}[47{SUFFIX}");
                     buf.Append(GetAnsiForegroundColor(display[x, y].col));
                     buf.Append(display[x, y].c);
                     buf.Append(RESET);
