@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _3D_Console_Game.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -14,6 +15,7 @@ namespace _3D_Console_Game
             this.isDamped = isDamped;
         }
 
+        List<object> collidedObjects = new();
         public Vector3 velocity;
         float velocityRoll;
         float velocityPitch;
@@ -29,11 +31,7 @@ namespace _3D_Console_Game
         {
             Vector3 thisMid = hitbox.MidPoint;
             Vector3 force = forceDir * strength;
-
             Vector3 tangentialVelocity = velocity - Vector3.Dot(velocity, forceDir) * forceDir;
-
-            
-
             Vector3 r = collisionPoint - thisMid;
             Vector3 torque = Vector3.Cross(r, tangentialVelocity + force);
 
@@ -41,12 +39,18 @@ namespace _3D_Console_Game
             velocityPitch += torque.X;
             velocityRoll += torque.Z;
 
-
             velocity += force;
+        }
+
+
+        public bool CollidedWithObject(object obj)
+        {
+            return collidedObjects.Contains(obj);
         }
 
         public void Update(double deltaTime)
         {
+            collidedObjects.Clear();
             float dt = (float)deltaTime;
 
             velocity.Y -= Gravity * dt;
@@ -59,27 +63,20 @@ namespace _3D_Console_Game
                 velocityYaw -= (velocityYaw) * AirFriction * dt;
             }
 
-
-            //SetPos(Pos + velocity * dt);
             UpdatePos(velocity * dt, velocityRoll * dt, velocityPitch * dt, velocityYaw * dt);
             CheckCollision();
-
-            //if (Pos.Y < 0)
-            //{
-            //    SetPos(Pos * new Vector3(1, 0, 1));
-            //    velocity.Y = 0;
-            //}
         }
 
         private void CheckCollision()
         {
-            foreach (object obj in Game.activeDrawables)
+            foreach (object obj in Game.activeObjects)
             {
                 if (obj is ICollidable collidable && obj != this && !(obj is Enemy enemy && enemy.Body == this))
                 {
                     (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = collidable.CollidesWith(hitbox);
                     if (collides)
                     {
+                        collidedObjects.Add(obj);
                         if (penetration > 0)
                         {
                             SetPos(Pos + dirOut * (penetration + 0.001f));
@@ -104,5 +101,8 @@ namespace _3D_Console_Game
                 }
             }
         }
+
+
+
     }
 }

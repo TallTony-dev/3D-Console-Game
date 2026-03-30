@@ -42,7 +42,7 @@ namespace _3D_Console_Game
 
         }
 
-
+        
         public void UpdatePos(Vector3 deltaPos, float deltaRoll = 0, float deltaPitch = 0, float deltaYaw = 0)
         {
             Pos += deltaPos;
@@ -76,7 +76,10 @@ namespace _3D_Console_Game
             hitbox.origin = pos;
             RebuildBarriers();
         }
-
+        public void SetPos(Vector3 pos, Vector3 dir)
+        {
+            SetPos(pos, -MathF.Asin(dir.Y), 0, MathF.Atan2(dir.X, dir.Z));
+        }
         public void SetPos(Vector3 pos, float pitch, float roll, float yaw)
         {
             this.Pos = pos;

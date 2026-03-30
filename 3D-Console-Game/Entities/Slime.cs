@@ -6,7 +6,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _3D_Console_Game
+namespace _3D_Console_Game.Entities
 {
     internal class Slime : Enemy
     {
@@ -19,7 +19,7 @@ namespace _3D_Console_Game
         double timeSinceTakenDamage = 10;
         float animTime = 0;
 
-        public override void TakeDamage(float damage)
+        public override void TakeDamage(float damage, Vector3 sourcePos)
         {
             health -= damage;
             timeSinceTakenDamage = 0;
@@ -38,9 +38,17 @@ namespace _3D_Console_Game
             }
             timeSinceTakenDamage += dt;
 
-            body.Update(dt);
+
             Player player = Program.game.player;
             Vector3 target = player.Hitbox.MidPoint;
+
+            if (player.ObjectCollidedWithPlayer(this))
+            {
+                player.TakeDamage(5, MidPoint);
+                
+            }
+
+            body.Update(dt);
 
             if (animTime > 3 && animTime < 4)
             {
@@ -59,7 +67,11 @@ namespace _3D_Console_Game
                 body.velocity.X = 0;
                 body.velocity.Z = 0;
                 body.velocity += new Vector3(0, 5, 0);
-                body.velocity += Vector3.Normalize(target - body.MidPoint) * 6f;
+                Vector3 toTarget = target - body.MidPoint;
+                if (toTarget.LengthSquared() > 0.0001f)
+                {
+                    body.velocity += Vector3.Normalize(toTarget) * 6f;
+                }
                 animTime = 0;
             }
 

@@ -14,7 +14,7 @@ namespace _3D_Console_Game
         {
             List<ICollidable> result = new List<ICollidable>();
 
-            foreach (ICollidable obj in Game.activeDrawables)
+            foreach (ICollidable obj in Game.activeObjects)
             {
                 if (obj.CollidesWith(new Prism(origin,origin, origin + direction * dist, origin + direction * dist)).collides)
                 {
@@ -29,7 +29,7 @@ namespace _3D_Console_Game
             ICollidable ?closest = null;
             float closestDist = float.MaxValue;
 
-            foreach (ICollidable obj in Game.activeDrawables)
+            foreach (ICollidable obj in Game.activeObjects)
             {
                 (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = obj.CollidesWith(new Prism(origin, origin, origin + direction * dist, origin + direction * dist));
                 if (collides)
