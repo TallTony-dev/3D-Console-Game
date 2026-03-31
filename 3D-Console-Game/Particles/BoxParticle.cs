@@ -1,32 +1,30 @@
-﻿using System;
+﻿using _3D_Console_Game.Engine;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _3D_Console_Game
+namespace _3D_Console_Game.Particles
 {
-    internal class Particle : IUpdatable, IDrawable
+    internal class BoxParticle : Particle
     {
-
-        public float timeLeft;
-        Vector3 velocity;
         protected Box box;
+        Vector3 velocity;
 
-        public Particle(float duration, Box box, Vector3 velocity)
+        public BoxParticle(float duration, Box box, Vector3 velocity) : base(duration)
         {
-            timeLeft = duration;
             this.box = box;
             this.velocity = velocity;
         }
 
-        public virtual void Update(double dt)
+        public override void Update(double dt)
         {
             box.UpdatePos(velocity * (float)dt);
         }
 
-        public void Draw(Display display)
+        public override void Draw(Display display)
         {
             box.Draw(display);
         }

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using _3D_Console_Game.Engine;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _3D_Console_Game
+namespace _3D_Console_Game.Particles
 {
     internal static class ParticleManager
     {

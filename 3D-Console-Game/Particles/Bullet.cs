@@ -1,4 +1,5 @@
-﻿using _3D_Console_Game.Entities;
+﻿using _3D_Console_Game.Engine;
+using _3D_Console_Game.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,9 +7,9 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _3D_Console_Game
+namespace _3D_Console_Game.Particles
 {
-    internal class Bullet : Particle
+    internal class Bullet : BoxParticle
     {
         float damage = 0;
         bool hitsEnemies;
@@ -26,7 +27,7 @@ namespace _3D_Console_Game
 
             foreach (object obj in Game.activeObjects)
             {
-                if ((obj is Player p && hitsPlayer))
+                if (obj is Player p && hitsPlayer)
                 {
                     (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = box.CollidesWith(p.Hitbox);
                     if (collides)
@@ -37,7 +38,7 @@ namespace _3D_Console_Game
                     }
                 }
 
-                if ((obj is Entity e && hitsEnemies && obj is Enemy))
+                if (obj is Entity e && hitsEnemies && obj is Enemy)
                 {
 
                     (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = e.CollidesWith(box.hitbox);

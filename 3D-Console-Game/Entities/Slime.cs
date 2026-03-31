@@ -5,6 +5,8 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using _3D_Console_Game.Engine;
+using _3D_Console_Game.Particles;
 
 namespace _3D_Console_Game.Entities
 {
@@ -21,7 +23,7 @@ namespace _3D_Console_Game.Entities
 
         public override void TakeDamage(float damage, Vector3 sourcePos)
         {
-            health -= damage;
+            base.TakeDamage(damage, sourcePos);
             timeSinceTakenDamage = 0;
         }
 
@@ -73,6 +75,11 @@ namespace _3D_Console_Game.Entities
                     body.velocity += Vector3.Normalize(toTarget) * 6f;
                 }
                 animTime = 0;
+                Vector3 bot = body.MidBottom;
+                for (int i = 0; i < 10; i++)
+                {
+                    ParticleManager.AddParticle(new SplortParticle(1, bot, ConsoleColor.Green, 0.4f, 0.4f, 1, MathF.PI, 10, Vector3.UnitY, 5, 15));
+                }
             }
 
         }

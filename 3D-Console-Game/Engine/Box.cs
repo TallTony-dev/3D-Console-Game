@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _3D_Console_Game
+namespace _3D_Console_Game.Engine
 {
     internal class Box : IDrawable, ICollidable
     {
         Barrier[] barriers = new Barrier[6];
         public Vector3 MidPoint { get; private set; }
         public Vector3 Pos { get; private set; }
+
         float width, height, depth;
         protected float pitch { get; private set; }
         protected float roll { get; private set; }
@@ -22,15 +24,24 @@ namespace _3D_Console_Game
 
         public bool isPickable = false;
 
+        public Vector3 MidBottom
+        {
+            get
+            {
+                return Pos + Vector3.Transform(new Vector3(width / 2, 0, depth / 2), Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll));
+            }
+        }
+
+
         public Box(Vector3 pos, float width, float height, float length, ConsoleColor col, float pitch = 0, float roll = 0, float yaw = 0)
         {
             this.yaw = yaw;
             this.roll = roll;
             this.pitch = pitch;
-            this.Pos = pos;
+            Pos = pos;
             this.width = width;
             this.height = height;
-            this.depth = length;
+            depth = length;
             this.col = col;
             hitbox = new Prism(pos, width, height, length, roll, pitch, yaw);
             RebuildBarriers();
@@ -72,7 +83,7 @@ namespace _3D_Console_Game
 
         public void SetPos(Vector3 pos)
         {
-            this.Pos = pos;
+            Pos = pos;
             hitbox.origin = pos;
             RebuildBarriers();
         }
@@ -82,7 +93,7 @@ namespace _3D_Console_Game
         }
         public void SetPos(Vector3 pos, float pitch, float roll, float yaw)
         {
-            this.Pos = pos;
+            Pos = pos;
             hitbox.origin = pos;
             this.roll = roll;
             this.pitch = pitch;

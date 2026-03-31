@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _3D_Console_Game
+namespace _3D_Console_Game.Engine
 {
     internal class Prism
     {
@@ -53,7 +53,7 @@ namespace _3D_Console_Game
         }
         public Prism(Vector3 pos, float width, float height, float depth, float roll = 0, float pitch = 0, float yaw = 0)
         {
-            this.origin = pos;
+            origin = pos;
             this.width = width;
             this.height = height;
             this.depth = depth;
@@ -147,7 +147,7 @@ namespace _3D_Console_Game
                 }
             }
 
-            float dir = Vector3.Dot(this.MidPoint - b.MidPoint, axes[smallestOverlapAxis]);
+            float dir = Vector3.Dot(MidPoint - b.MidPoint, axes[smallestOverlapAxis]);
             if (dir > 0)
             {
                 axes[smallestOverlapAxis] = -axes[smallestOverlapAxis];
@@ -182,7 +182,7 @@ namespace _3D_Console_Game
             if (count > 0)
                 collisionPoint /= count;
             else
-                collisionPoint = (this.MidPoint + b.MidPoint) * 0.5f;
+                collisionPoint = (MidPoint + b.MidPoint) * 0.5f;
 
             return (true, Vector3.Normalize(mtv), smallestOverlap, collisionPoint);
         }
@@ -194,9 +194,9 @@ namespace _3D_Console_Game
             (Vector3 minA, Vector3 maxA) = GetAABBMinMax();
             (Vector3 minB, Vector3 maxB) = prism.GetAABBMinMax();
 
-            return (minA.X < maxB.X && minB.X < maxA.X
+            return minA.X < maxB.X && minB.X < maxA.X
                  && minA.Y < maxB.Y && minB.Y < maxA.Y
-                 && minA.Z < maxB.Z && minB.Z < maxA.Z);
+                 && minA.Z < maxB.Z && minB.Z < maxA.Z;
         }
 
         private (Vector3 min, Vector3 max) GetAABBMinMax()
@@ -223,9 +223,9 @@ namespace _3D_Console_Game
         public bool AABBContains(Vector3 point)
         {
             (Vector3 min, Vector3 max) = GetAABBMinMax();
-            return (point.X < max.X && min.X < point.X
+            return point.X < max.X && min.X < point.X
                 && point.Y < max.Y && min.Y < point.Y
-                && point.Z < max.Z && min.Z < point.Z);
+                && point.Z < max.Z && min.Z < point.Z;
         }
     }
 }

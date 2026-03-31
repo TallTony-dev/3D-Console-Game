@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualBasic;
+﻿using _3D_Console_Game.Engine;
+using _3D_Console_Game.Particles;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -116,8 +118,11 @@ namespace _3D_Console_Game
             if (InputManager.IsCharPressedAsync('R'))
             {
                 Vector3 camPoss = camPos + Forward;
-                ParticleManager.AddParticle(new Bullet(6f, 10, 4, camPoss, Forward, ConsoleColor.Green, false, true));
-
+                ParticleManager.AddParticle(new Bullet(6f, 1, 4, camPoss, Forward, ConsoleColor.Green, false, true));
+                //for (int i = 0; i < 3; i++)
+                //{
+                //    ParticleManager.AddParticle(new SplortParticle(1, camPos + Forward, ConsoleColor.DarkGreen, 0.1f, 0.1f, 1.4f, 1.4f, 0f, Forward, 5, 0));
+                //}
             }
 
             if (InputManager.IsKeyPressed(ConsoleKey.E))

@@ -4,7 +4,9 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using _3D_Console_Game.Engine;
 using _3D_Console_Game.Entities;
+using _3D_Console_Game.Particles;
 
 namespace _3D_Console_Game
 {
