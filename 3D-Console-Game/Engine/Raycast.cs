@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _3D_Console_Game
+namespace _3D_Console_Game.Engine
 {
     internal static class Raycast
     {
@@ -29,16 +29,19 @@ namespace _3D_Console_Game
             ICollidable ?closest = null;
             float closestDist = float.MaxValue;
 
-            foreach (ICollidable obj in Game.activeObjects)
+            foreach (object obj in Game.activeObjects)
             {
-                (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = obj.CollidesWith(new Prism(origin, origin, origin + direction * dist, origin + direction * dist));
-                if (collides)
+                if (obj is ICollidable c)
                 {
-                    float distance = (obj.MidPoint - origin).Length();
-                    if (distance < closestDist)
+                    (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = c.CollidesWith(new Prism(origin, origin, origin + direction * dist, origin + direction * dist));
+                    if (collides)
                     {
-                        closestDist = distance;
-                        closest = obj;
+                        float distance = (c.MidPoint - origin).Length();
+                        if (distance < closestDist)
+                        {
+                            closestDist = distance;
+                            closest = c;
+                        }
                     }
                 }
             }

@@ -6,7 +6,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _3D_Console_Game
+namespace _3D_Console_Game.Engine
 {
     internal class PhysicsBox : Box, IUpdatable
     {
@@ -58,9 +58,9 @@ namespace _3D_Console_Game
             {
                 velocity.X -= Math.Sign(velocity.X) * Friction * dt;
                 velocity.Z -= Math.Sign(velocity.Z) * Friction * dt;
-                velocityRoll -= (velocityRoll) * AirFriction * dt;
-                velocityPitch -= (velocityPitch) * AirFriction * dt;
-                velocityYaw -= (velocityYaw) * AirFriction * dt;
+                velocityRoll -= velocityRoll * AirFriction * dt;
+                velocityPitch -= velocityPitch * AirFriction * dt;
+                velocityYaw -= velocityYaw * AirFriction * dt;
             }
 
             UpdatePos(velocity * dt, velocityRoll * dt, velocityPitch * dt, velocityYaw * dt);

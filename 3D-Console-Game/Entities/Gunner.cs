@@ -1,4 +1,6 @@
-﻿using System;
+﻿using _3D_Console_Game.Engine;
+using _3D_Console_Game.Particles;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -25,6 +27,7 @@ namespace _3D_Console_Game.Entities
         {
             health -= damage;
             timeSinceTakenDamage = 0;
+            base.TakeDamage(damage, sourcePos);
         }
 
         public override void Update(double dt)
@@ -47,7 +50,7 @@ namespace _3D_Console_Game.Entities
                 timeSinceAttacked = 0;
                 ParticleManager.AddParticle(new Bullet(4, 4, 3, gun.MidPoint, gunDir, ConsoleColor.DarkRed, true, false));
             }
-            body.velocity = Vector3.Clamp(4 * targetDir * ( toTargetFromBody.LengthSquared() - 7) * (float)dt, new Vector3(-10,0,-10),new Vector3(10,0,10)) + new Vector3(0,body.velocity.Y,0);
+            body.velocity = Vector3.Clamp(targetDir * ( toTargetFromBody.LengthSquared() - 23) * 0.2f, new Vector3(-10,0,-10),new Vector3(10,0,10)) + new Vector3(0,body.velocity.Y,0);
 
             gun.SetPos(body.Pos + new Vector3(0, 1.4f, 0), gunAimDir);
             body.Update(dt);

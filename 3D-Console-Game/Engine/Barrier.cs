@@ -6,7 +6,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _3D_Console_Game
+namespace _3D_Console_Game.Engine
 {
     internal class Barrier : IDrawable, ICollidable
     {
@@ -20,7 +20,7 @@ namespace _3D_Console_Game
         {
             get
             {
-                return Vector3.Cross((BottomLeft - TopLeft), (TopRight - TopLeft));
+                return Vector3.Cross(BottomLeft - TopLeft, TopRight - TopLeft);
             }
         }
 

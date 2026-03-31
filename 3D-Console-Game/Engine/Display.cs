@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace _3D_Console_Game
+namespace _3D_Console_Game.Engine
 {
     internal class Display
     {
@@ -139,7 +139,7 @@ namespace _3D_Console_Game
                     float BCP = EdgeFunction(b, c, p);
                     float CAP = EdgeFunction(c, a, p);
 
-                    if ((ABP <= 0 && BCP <= 0 && CAP <= 0) || (ABP >= 0 && BCP >= 0 && CAP >= 0))
+                    if (ABP <= 0 && BCP <= 0 && CAP <= 0 || ABP >= 0 && BCP >= 0 && CAP >= 0)
                     {
                         // LLM: Barycentric weights for perspective-correct interpolation
                         float w0 = BCP / triArea;
@@ -159,7 +159,7 @@ namespace _3D_Console_Game
                             else if (nearest == absBCP) { distOfNearest = Vector4.Distance(b, c); }
                             else if (nearest == absCAP) { distOfNearest = Vector4.Distance(c, a); }
 
-                            values[x, y].strength = MathF.Pow((nearest * 2) / distOfNearest, 8) * 8;
+                            values[x, y].strength = MathF.Pow(nearest * 2 / distOfNearest, 8) * 8;
                             values[x, y].color = vertices[0].col;
                         }
                     }
@@ -334,7 +334,7 @@ namespace _3D_Console_Game
                         if (maxDist == 0 || value.distFromCam == float.MaxValue)
                             display[x, y].c = MapToChar(0);
                         else
-                            display[x, y].c = MapToChar(((value.distFromCam / maxDist) + value.strength) / 2);
+                            display[x, y].c = MapToChar((value.distFromCam / maxDist + value.strength) / 2);
                         display[x, y].col = value.color;
                     }
                 }
