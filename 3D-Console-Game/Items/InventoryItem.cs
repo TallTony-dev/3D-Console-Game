@@ -1,4 +1,5 @@
-﻿using System;
+﻿using _3D_Console_Game.Engine;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -52,6 +53,9 @@ namespace _3D_Console_Game.Items
                 }
             }
         }
+        public virtual void Draw(Display display)
+        {
 
+        }
     }
 }

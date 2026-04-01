@@ -19,6 +19,7 @@ namespace _3D_Console_Game.Hudstuff
             items.Add(new BoxItem(ConsoleColor.Black));
             items.Add(new BoxItem(ConsoleColor.Blue));
             items.Add(new BoxItem(ConsoleColor.DarkGreen));
+            items.Add(new WeaponItem(ConsoleColor.DarkMagenta));
         }
 
         public override void Update(float dt)
@@ -49,10 +50,7 @@ namespace _3D_Console_Game.Hudstuff
         {
             foreach (InventoryItem item in items)
             {
-                if (item is IDrawable d)
-                {
-                    d.Draw(display);
-                }
+                item.Draw(display);
             }
         }
 

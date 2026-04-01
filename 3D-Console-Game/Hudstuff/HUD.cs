@@ -18,9 +18,10 @@ namespace _3D_Console_Game.Hudstuff
             inGameHudElements.Add(new HealthBar());
             inGameHudElements.Add(Program.game.player.inventory);
 
-            pauseMenuHudElements.Add(new PauseElement());
+            pauseMenuHudElements.Add(new TextBoxElement(Console.WindowWidth / 2 - 11, 10, HudElement.Origin.TopLeft, "Press esc to resume"));
 
-            mainMenuHudElements.Add(new PauseElement());
+            mainMenuHudElements.Add(new TextBoxElement(Console.WindowWidth / 2 - 11, 10, HudElement.Origin.TopLeft, "Press enter to start"));
+
         }
 
         public static void Update(float dt)

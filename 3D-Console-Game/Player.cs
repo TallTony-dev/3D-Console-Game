@@ -30,17 +30,17 @@ namespace _3D_Console_Game
 
         List<object> collidedObjects = new();
         public Inventory inventory { get; private set; } = new();
-        Quaternion view = Quaternion.Identity;
+        public Quaternion view { get; private set; } = Quaternion.Identity;
         float yaw = 0f;
         float pitch = 0f;
-        Vector3 camPos = Vector3.Zero;
+        public Vector3 CamPos { get; private set; } = Vector3.Zero;
         Vector3 playerPos = new Vector3(0,0,0); 
         public Matrix4x4 ViewMatrix { 
             get {
                 // View matrix = inverse of camera transform
                 // First undo rotation (conjugate), then undo translation (negate)
                 Matrix4x4 rot = Matrix4x4.CreateFromQuaternion(Quaternion.Conjugate(view));
-                Matrix4x4 trans = Matrix4x4.CreateTranslation(-camPos);
+                Matrix4x4 trans = Matrix4x4.CreateTranslation(-CamPos);
                 Matrix4x4 vertInvert = Matrix4x4.Identity;
                 vertInvert.M22 = -1;
                 return trans * rot * vertInvert;
@@ -123,18 +123,18 @@ namespace _3D_Console_Game
 
             if (InputManager.IsCharPressedAsync('R'))
             {
-                Vector3 camPoss = camPos + Forward;
+                Vector3 camPoss = CamPos + Forward;
                 ParticleManager.AddParticle(new Bullet(6f, 1, 4, camPoss, Forward, ConsoleColor.Green, false, true));
                 //for (int i = 0; i < 3; i++)
                 //{
-                //    ParticleManager.AddParticle(new SplortParticle(1, camPos + Forward, ConsoleColor.DarkGreen, 0.1f, 0.1f, 1.4f, 1.4f, 0f, Forward, 5, 0));
+                //    ParticleManager.AddParticle(new SplortParticle(1, CamPos + Forward, ConsoleColor.DarkGreen, 0.1f, 0.1f, 1.4f, 1.4f, 0f, Forward, 5, 0));
                 //}
             }
 
             if (InputManager.IsKeyPressed(ConsoleKey.E))
             {
                 if (heldBox == null) { 
-                    ICollidable? c = Raycast.GetFirstObject(camPos, Forward, 1);
+                    ICollidable? c = Raycast.GetFirstObject(CamPos, Forward, 1);
                     if (c is Box b && b.isPickable)
                     {
                         heldBox = b;
@@ -157,7 +157,7 @@ namespace _3D_Console_Game
 
             if (heldBox != null)
             {
-                heldBox.SetPos(camPos + (heldBox.Pos - heldBox.MidPoint) + Forward, -MathF.Asin(Forward.Y), 0, MathF.Atan2(Forward.X, Forward.Z));
+                heldBox.SetPos(CamPos + (heldBox.Pos - heldBox.MidPoint) + Forward, -MathF.Asin(Forward.Y), 0, MathF.Atan2(Forward.X, Forward.Z));
             }
 
             Prism hitbox = Hitbox;
@@ -196,7 +196,7 @@ namespace _3D_Console_Game
                     }
                 }
             }
-            nearestLookCollision = Raycast.GetFirstObjectCollisionPos(camPos, Forward, 3f) ?? nearestLookCollision;
+            nearestLookCollision = Raycast.GetFirstObjectCollisionPos(CamPos, Forward, 3f) ?? nearestLookCollision;
 
             if (InputManager.IsCharPressedAsync(0x20) && isTouchingGround)
             {
@@ -228,7 +228,7 @@ namespace _3D_Console_Game
             }
             wasTouchingGround = isTouchingGround;
 
-            camPos = playerPos + new Vector3(0, 1.3f, 0);
+            CamPos = playerPos + new Vector3(0, 1.3f, 0);
 
             Vector2 delta = InputManager.GetMouseDelta();
             

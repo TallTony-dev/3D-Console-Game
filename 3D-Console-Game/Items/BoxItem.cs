@@ -44,7 +44,7 @@ namespace _3D_Console_Game.Items
             }
         }
 
-        public void Draw(Display display)
+        public override void Draw(Display display)
         {
             if (isSelected)
             {

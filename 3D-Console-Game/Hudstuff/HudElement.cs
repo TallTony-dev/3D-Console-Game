@@ -127,6 +127,6 @@ namespace _3D_Console_Game.Hudstuff
                 display[bx, by + h] = ('└', col);
         }
 
-        protected enum Origin { TopLeft, BottomRight, BottomLeft };
+        public enum Origin { TopLeft, BottomRight, BottomLeft };
     }
 }
