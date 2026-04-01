@@ -49,6 +49,14 @@ namespace _3D_Console_Game.Particles
                         return;
                     }
                 }
+                if (obj is Box b)
+                {
+                    if (b.CollidesWith(box.hitbox).collides)
+                    {
+                        timeLeft = -1;
+                        return;
+                    }
+                }
             }
         }
     }

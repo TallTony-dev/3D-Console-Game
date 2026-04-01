@@ -18,6 +18,22 @@ namespace _3D_Console_Game.Engine
 
         static Point currentPos;
         static Vector2 mouseDelta;
+        static bool isLeftMousePressed = false;
+        static bool isLeftMouseDown = false;
+        static bool lockMousePos = false;
+
+        //static IntPtr consoleHandle = GetConsoleWindow();
+        //public static float consoleWidth;
+        //public static float consoleHeight;
+
+        public static bool IsLeftMouseDown()
+        {
+            return isLeftMouseDown;
+        }
+        public static bool IsLeftMousePressed()
+        {
+            return isLeftMousePressed;
+        }
         public static bool IsKeyPressed(ConsoleKey key)
         {
             return key == pressedKey.Key;
@@ -31,6 +47,8 @@ namespace _3D_Console_Game.Engine
         {
             return GetAsyncKeyState(c) < 0;
         }
+        public static void LockMousePos() { lockMousePos = true; }
+        public static void UnlockMousePos() { lockMousePos = false; }
 
         [DllImport("user32.dll")]
         static extern bool GetCursorPos(ref Point lpPoint);
@@ -41,12 +59,48 @@ namespace _3D_Console_Game.Engine
         //[DllImport("user32.dll")]
         //private static extern int ShowCursor(bool bShow);
 
+        //[StructLayout(LayoutKind.Sequential)]
+        //public struct RECT
+        //{
+        //    public int Left;
+        //    public int Top;
+        //    public int Right;
+        //    public int Bottom;
+        //}
+
+        //[DllImport("kernel32.dll", SetLastError = true)]
+        //public static extern IntPtr GetConsoleWindow();
+
+        //[DllImport("user32.dll", SetLastError = true)]
+        //[return: MarshalAs(UnmanagedType.Bool)]
+        //public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
         public static void UpdateMousePos()
         {
+            if (InputManager.IsCharPressedAsync(0x01))
+            {
+                if (!isLeftMouseDown && !isLeftMousePressed)
+                {
+                    isLeftMousePressed = true;
+                }
+                else if (isLeftMousePressed)
+                    isLeftMousePressed = false;
+
+                isLeftMouseDown = true;
+            }
+            else { isLeftMouseDown = false; }
             GetCursorPos(ref currentPos);
-            mouseDelta = new Vector2(500 - currentPos.X, 500 - currentPos.Y);
-            SetCursorPos(500, 500);
+
+            if (lockMousePos)
+            {
+                mouseDelta = new Vector2(500 - currentPos.X, 500 - currentPos.Y);
+                SetCursorPos(500, 500);
+            }
+
+            //GetWindowRect(consoleHandle, out RECT rect);
+            //currentPos.X -= rect.Left;
+            //currentPos.Y -= rect.Top;
+            ////currentPos.X /= 12;
         }
 
         //public static void HideCursor()

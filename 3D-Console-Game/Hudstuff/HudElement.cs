@@ -26,6 +26,11 @@ namespace _3D_Console_Game.Hudstuff
 
         public abstract void Draw((char c, ConsoleColor col)[,] display);
 
+        public virtual void Update(float dt)
+        {
+
+        }
+
         protected void ClearArea((char c, ConsoleColor col)[,] display)
         {
             int xlen = display.GetLength(0);
@@ -50,6 +55,17 @@ namespace _3D_Console_Game.Hudstuff
                     }
                 }
             }
+            else if (origin == Origin.BottomLeft)
+            {
+                for (int i = x; i < x + width && i < xlen; i++)
+                {
+                    for (int j = ylen - y - height; j < ylen - y && j < ylen; j++)
+                    {
+                        if (j >= 0)
+                            display[i, j] = (' ', ConsoleColor.Black);
+                    }
+                }
+            }
 
 
         }
@@ -59,48 +75,58 @@ namespace _3D_Console_Game.Hudstuff
             int xlen = display.GetLength(0);
             int ylen = display.GetLength(1);
 
+            int bx, by;
             if (origin == Origin.TopLeft)
             {
-                for (int i = x; i < x + width && i < xlen; i++)
-                {
-                    if (y < ylen)
-                        display[i, y] = ('─', col);
-                    if (y + height < ylen)
-                        display[i, y + height] = ('─', col);
-                }
-                for (int i = y; i < y + height && i < ylen; i++)
-                {
-                    if (x < xlen)
-                        display[x, i] = ('│', col);
-                    if (x + width < xlen)
-                        display[x + width, i] = ('│', col);
-                }
-
-                display[x + width, y] = ('┐', col);
-                display[x + width, y + height] = ('┘', col);
-                display[x, y] = ('┌', col);
-                display[x, y + height] = ('└', col);
+                bx = x;
+                by = y;
             }
-            if (origin == Origin.BottomRight)
+            else if (origin == Origin.BottomRight)
             {
-                for (int i = xlen - x; i > xlen - x - width && i >= 0; i--)
-                {
-                    if (y < ylen)
-                        display[i, y] = ('─', col);
-                    if (y + height < ylen)
-                        display[i, y + height] = ('─', col);
-                }
-                for (int i = ylen - y; i < ylen - y - height && i >= 0; i--)
-                {
-                    if (x < xlen)
-                        display[x, i] = ('│', col);
-                    if (x + width < xlen)
-                        display[x + width, i] = ('│', col);
-                }
+                bx = xlen - x - width;
+                by = ylen - y - height;
+            }
+            else // BottomLeft
+            {
+                bx = x;
+                by = ylen - y - height - 1;
             }
 
+            DrawBox(display, bx, by, width, height, col);
         }
 
-        protected enum Origin { TopLeft, BottomRight };
+        protected static void DrawBox((char c, ConsoleColor col)[,] display, int bx, int by, int w, int h, ConsoleColor col)
+        {
+            int xlen = display.GetLength(0);
+            int ylen = display.GetLength(1);
+
+            for (int i = bx; i < bx + w && i < xlen; i++)
+            {
+                if (i < 0) continue;
+                if (by >= 0 && by < ylen)
+                    display[i, by] = ('─', col);
+                if (by + h >= 0 && by + h < ylen)
+                    display[i, by + h] = ('─', col);
+            }
+            for (int j = by; j < by + h && j < ylen; j++)
+            {
+                if (j < 0) continue;
+                if (bx >= 0 && bx < xlen)
+                    display[bx, j] = ('│', col);
+                if (bx + w >= 0 && bx + w < xlen)
+                    display[bx + w, j] = ('│', col);
+            }
+
+            if (bx + w >= 0 && bx + w < xlen && by >= 0 && by < ylen)
+                display[bx + w, by] = ('┐', col);
+            if (bx + w >= 0 && bx + w < xlen && by + h >= 0 && by + h < ylen)
+                display[bx + w, by + h] = ('┘', col);
+            if (bx >= 0 && bx < xlen && by >= 0 && by < ylen)
+                display[bx, by] = ('┌', col);
+            if (bx >= 0 && bx < xlen && by + h >= 0 && by + h < ylen)
+                display[bx, by + h] = ('└', col);
+        }
+
+        protected enum Origin { TopLeft, BottomRight, BottomLeft };
     }
 }
