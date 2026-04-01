@@ -12,7 +12,7 @@ namespace _3D_Console_Game
 {
     internal class Game
     {
-        public Game() { display = new Display(50, 50); }
+        public Game() { display = new Display(Console.WindowWidth, Console.WindowHeight - 1); }
 
         public Player player = new Player(100);
 
@@ -20,7 +20,7 @@ namespace _3D_Console_Game
         
         int score = 0;
 
-        GameState state = GameState.Menu;
+        public GameState state { get; private set; } = GameState.Menu;
 
 
         public void InitializeGame()
@@ -37,14 +37,18 @@ namespace _3D_Console_Game
         }
 
 
+        public static double ElapsedTime { get; private set; } = 0;
         public void UpdateGame(double deltaTime)
         {
+            ElapsedTime += deltaTime;
             InputManager.UpdateKey();
             display.fps = (int)(1 / deltaTime);
+            Hudstuff.HUD.Update((float)deltaTime);
+            display.Update(deltaTime, player);
+
             if (state == GameState.inGame)
             {
                 InputManager.UpdateMousePos();
-                display.Update(deltaTime, player);
                 ParticleManager.UpdateParticles(deltaTime);
 
                 for (int i = 0; i < activeObjects.Count; i++)
@@ -59,6 +63,11 @@ namespace _3D_Console_Game
                         }
                     }
                 }
+                if (InputManager.IsKeyPressed(ConsoleKey.Escape)) //escape key
+                {
+                    state = GameState.Paused;
+                    InputManager.UnlockMousePos();
+                }
 
                 if (InputManager.IsKeyPressed(ConsoleKey.C))
                 {
@@ -71,14 +80,21 @@ namespace _3D_Console_Game
                 }
 
             }
+            else if (state == GameState.Paused)
+            {
+                if (InputManager.IsKeyPressed(ConsoleKey.Escape))
+                {
+                    state = GameState.inGame;
+                    InputManager.LockMousePos();
+                }
+            }
             else if (state == GameState.Menu)
             {
-                display.DrawMenu();
                 if (InputManager.IsKeyPressed(ConsoleKey.Enter))
                 {
-                    display = new Display(Console.WindowWidth - 1, Console.WindowHeight - 2);
+                    display = new Display(Console.WindowWidth, Console.WindowHeight - 1);
                     state = GameState.inGame;
-
+                    InputManager.LockMousePos();
                 }
             }
             else if (state == GameState.Loss)
@@ -105,24 +121,20 @@ namespace _3D_Console_Game
         Display display;
         public void DrawGame()
         {
-
             if (state == GameState.inGame)
             {
-                foreach (object obj in activeObjects)
-                {
-                    if (obj is IDrawable draw)
-                    {
-                        draw.Draw(display);
-                    }
-                }
+                Parallel.ForEach(
+                    activeObjects.OfType<IDrawable>(),
+                    draw => draw.Draw(display)
+                );
                 ParticleManager.DrawParticles(display);
-
-                display.DrawGameToConsole(score);
-                display.Clear();
+                player.inventory.Draw3DItems(display);
             }
+            display.DrawGameToConsole(score);
+            display.Clear();
         }
 
 
-        enum GameState { Menu, inGame, Loss, Victory }
+        public enum GameState { Menu, inGame, Loss, Victory, Paused }
     }
 }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using _3D_Console_Game.Hudstuff;
 
 namespace _3D_Console_Game
 {
@@ -25,8 +26,10 @@ namespace _3D_Console_Game
         }
         public Vector3 Forward { get { return Vector3.Transform(-Vector3.UnitZ, view); } }
         public Vector3 Left { get { return Vector3.Transform(-Vector3.UnitX, view); } }
-        List<object> collidedObjects = new();
+        public Vector3 nearestLookCollision = Vector3.Zero;
 
+        List<object> collidedObjects = new();
+        public Inventory inventory { get; private set; } = new();
         Quaternion view = Quaternion.Identity;
         float yaw = 0f;
         float pitch = 0f;
@@ -84,6 +87,8 @@ namespace _3D_Console_Game
             return collidedObjects.Contains(obj);
         }
 
+        bool wasTouchingGround = true;
+        double timeSinceWalkParticle = 0;
         public void Update(double deltaTime)
         {
             collidedObjects.Clear();
@@ -93,6 +98,7 @@ namespace _3D_Console_Game
             Vector3 xzForward = xzForwardRaw.LengthSquared() > 0.0001f ? Vector3.Normalize(xzForwardRaw) : Vector3.UnitZ;
             Vector3 xzLeftRaw = Left * new Vector3(1, 0, 1);
             Vector3 xzLeft = xzLeftRaw.LengthSquared() > 0.0001f ? Vector3.Normalize(xzLeftRaw) : Vector3.UnitX;
+
 
             bool isTouchingGround = playerPos.Y == 0;
             timeSinceDamageTaken += dt;
@@ -155,6 +161,7 @@ namespace _3D_Console_Game
             }
 
             Prism hitbox = Hitbox;
+
             foreach (object obj in Game.activeObjects)
             {
                 if (obj is ICollidable collidable && obj != heldBox)
@@ -171,6 +178,7 @@ namespace _3D_Console_Game
 
                         if (dirOut.Y > 0.7f)
                         {
+
                             isTouchingGround = true;
                         }
 
@@ -188,11 +196,37 @@ namespace _3D_Console_Game
                     }
                 }
             }
+            nearestLookCollision = Raycast.GetFirstObjectCollisionPos(camPos, Forward, 3f) ?? nearestLookCollision;
 
             if (InputManager.IsCharPressedAsync(0x20) && isTouchingGround)
             {
                 playerVel.Y = 5f;
+                for (int i = 0; i < 15; i++)
+                {
+                    ParticleManager.AddParticle(new SplortParticle(1, playerPos + new Vector3(width / 2, 0, depth / 2), ConsoleColor.DarkBlue, 0.3f, 0.3f, 1, MathF.PI, 10, Vector3.UnitY, 6.5f, 15));
+                }
             }
+
+            if (isTouchingGround)
+            {
+                if (!wasTouchingGround)
+                {
+                    for (int i = 0; i < 15; i++)
+                    {
+                        ParticleManager.AddParticle(new SplortParticle(1, playerPos + new Vector3(width / 2, 0, depth / 2), ConsoleColor.DarkBlue, 0.3f, 0.3f, 1, MathF.PI, 10, Vector3.UnitY, 6.5f, 15));
+                    }
+                }
+                timeSinceWalkParticle += deltaTime;
+                if (timeSinceWalkParticle > 0.2)
+                {
+                    for (int i = 0; i < playerVel.Length() - 0.6f; i++)
+                    {
+                        ParticleManager.AddParticle(new SplortParticle(1, playerPos + new Vector3(width / 2, 0, depth / 2), ConsoleColor.Yellow, 0.1f, 0.1f, 0.3f, 0.3f, 10, Vector3.Normalize(-playerVel + new Vector3(0, 2f, 0)), 4f, 15));
+                    }
+                    timeSinceWalkParticle = 0;
+                }
+            }
+            wasTouchingGround = isTouchingGround;
 
             camPos = playerPos + new Vector3(0, 1.3f, 0);
 
@@ -207,5 +241,6 @@ namespace _3D_Console_Game
 
         }
 
+        
     }
 }

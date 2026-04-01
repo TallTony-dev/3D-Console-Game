@@ -15,9 +15,9 @@ namespace _3D_Console_Game.Engine
         public Vector3 Pos { get; private set; }
 
         float width, height, depth;
-        protected float pitch { get; private set; }
-        protected float roll { get; private set; }
-        protected float yaw { get; private set; }
+        public float pitch { get; private set; }
+        public float roll { get; private set; }
+        public float yaw { get; private set; }
 
         public ConsoleColor col;
         public Prism hitbox { get; protected set; }
