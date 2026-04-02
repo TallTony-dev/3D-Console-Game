@@ -31,7 +31,20 @@ namespace _3D_Console_Game.Engine
                 return Pos + Vector3.Transform(new Vector3(width / 2, 0, depth / 2), Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll));
             }
         }
-
+        public Vector3 MidTop
+        {
+            get
+            {
+                return Pos + Vector3.Transform(new Vector3(width / 2, height, depth / 2), Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll));
+            }
+        }
+        public Vector3 MidBack
+        {
+            get
+            {
+                return Pos + Vector3.Transform(new Vector3(width / 2, height / 2, depth), Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll));
+            }
+        }
 
         public Box(Vector3 pos, float width, float height, float length, ConsoleColor col, float pitch = 0, float roll = 0, float yaw = 0)
         {
@@ -48,7 +61,7 @@ namespace _3D_Console_Game.Engine
         }
 
         public Box(Vector3 pos, float width, float height, float length, ConsoleColor col, Vector3 dir) :
-            this(pos, width, height, length, col, -MathF.Asin(dir.Y), 0, MathF.Atan2(dir.X, dir.Z))
+            this(pos, width, height, length, col, -MathF.Asin(Vector3.Normalize(dir).Y), 0, MathF.Atan2(dir.X, dir.Z))
         {
 
         }
@@ -89,7 +102,8 @@ namespace _3D_Console_Game.Engine
         }
         public void SetPos(Vector3 pos, Vector3 dir)
         {
-            SetPos(pos, -MathF.Asin(dir.Y), 0, MathF.Atan2(dir.X, dir.Z));
+            Vector3 normDir = Vector3.Normalize(dir);
+            SetPos(pos, -MathF.Asin(normDir.Y), 0, MathF.Atan2(normDir.X, normDir.Z));
         }
         public void SetPos(Vector3 pos, float pitch, float roll, float yaw)
         {

@@ -13,7 +13,7 @@ namespace _3D_Console_Game.Items
         public int count = 1;
         protected bool isSelected = false;
 
-        char[,] tex =
+        protected char[,] tex =
         {
             { 'E', 'E', 'E', },
             { '1', 'E', 'E', },

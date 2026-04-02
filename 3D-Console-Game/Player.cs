@@ -121,15 +121,15 @@ namespace _3D_Console_Game
                 playerVel -= xzLeft * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzLeft)) + 0.1f);
             }
 
-            if (InputManager.IsCharPressedAsync('R'))
-            {
-                Vector3 camPoss = CamPos + Forward;
-                ParticleManager.AddParticle(new Bullet(6f, 1, 4, camPoss, Forward, ConsoleColor.Green, false, true));
-                //for (int i = 0; i < 3; i++)
-                //{
-                //    ParticleManager.AddParticle(new SplortParticle(1, CamPos + Forward, ConsoleColor.DarkGreen, 0.1f, 0.1f, 1.4f, 1.4f, 0f, Forward, 5, 0));
-                //}
-            }
+            //if (InputManager.IsCharPressedAsync('R'))
+            //{
+            //    Vector3 camPoss = CamPos + Forward;
+            //    ParticleManager.AddParticle(new Bullet(6f, 1, 4, camPoss, Forward, ConsoleColor.Green, false, true));
+            //    //for (int i = 0; i < 3; i++)
+            //    //{
+            //    //    ParticleManager.AddParticle(new SplortParticle(1, CamPos + Forward, ConsoleColor.DarkGreen, 0.1f, 0.1f, 1.4f, 1.4f, 0f, Forward, 5, 0));
+            //    //}
+            //}
 
             if (InputManager.IsKeyPressed(ConsoleKey.E))
             {
