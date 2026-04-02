@@ -14,7 +14,7 @@ namespace _3D_Console_Game.Particles
         float damage = 0;
         bool hitsEnemies;
         bool hitsPlayer;
-        public Bullet(float duration, float damage, float velocity, Vector3 pos, Vector3 dir, ConsoleColor col, bool hitsPlayer, bool hitsEnemies, float width = 0.1f, float height = 0.1f, float length = 0.3f) : base(duration, new Box(pos, width, height, length, col, dir), velocity * dir)
+        public Bullet(float duration, float damage, float velocity, Vector3 pos, Vector3 dir, ConsoleColor col, bool hitsPlayer, bool hitsEnemies, float width = 0.1f, float height = 0.1f, float length = 0.3f) : base(duration, new Box(pos + new Vector3(width / 2f, height / 2f, length/2f), width, height, length, col, dir), velocity * Vector3.Normalize(dir))
         {
             this.damage = damage;
             this.hitsPlayer = hitsPlayer;

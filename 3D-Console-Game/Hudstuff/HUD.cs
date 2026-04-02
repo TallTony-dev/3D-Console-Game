@@ -30,6 +30,8 @@ namespace _3D_Console_Game.Hudstuff
                 foreach (var element in inGameHudElements) { element.Update(dt); }
             else if (Program.game.state == Game.GameState.Paused) 
                 foreach (var element in pauseMenuHudElements) { element.Update(dt); }
+            else if (Program.game.state == Game.GameState.Menu)
+                foreach (var element in mainMenuHudElements) { element.Update(dt); }
         }
 
         public static void DrawHUD((char c, ConsoleColor col)[,] display)

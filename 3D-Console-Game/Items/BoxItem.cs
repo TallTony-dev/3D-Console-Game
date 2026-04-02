@@ -10,7 +10,7 @@ namespace _3D_Console_Game.Items
 {
     internal class BoxItem : InventoryItem, IDrawable
     {
-        static readonly char[,] tex =
+        static readonly char[,] texture =
         {
             { 'B', '▓', '▓', },
             { 'O', '▓', '▓', },
@@ -20,7 +20,7 @@ namespace _3D_Console_Game.Items
 
         Box box;
 
-        public BoxItem(ConsoleColor boxCol) : base(boxCol, tex)
+        public BoxItem(ConsoleColor boxCol) : base(boxCol, texture)
         {
             box = new Box(Vector3.Zero, 1, 1, 1, boxCol);
         }

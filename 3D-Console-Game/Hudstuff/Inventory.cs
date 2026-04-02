@@ -3,6 +3,8 @@ using _3D_Console_Game.Items;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,7 +21,8 @@ namespace _3D_Console_Game.Hudstuff
             items.Add(new BoxItem(ConsoleColor.Black));
             items.Add(new BoxItem(ConsoleColor.Blue));
             items.Add(new BoxItem(ConsoleColor.DarkGreen));
-            items.Add(new WeaponItem(ConsoleColor.DarkMagenta));
+            items.Add(new WeaponItem(ConsoleColor.DarkMagenta, Vector3.Zero));
+            items.Add(new ShotgunItem(ConsoleColor.DarkGreen, 5));
         }
 
         public override void Update(float dt)
