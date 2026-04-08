@@ -1,4 +1,5 @@
 ﻿using _3D_Console_Game.Engine;
+using _3D_Console_Game.Particles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,6 +47,10 @@ namespace _3D_Console_Game.Entities
             health -= damage;
             if (health <= 0)
             {
+                for (int i = 0; i < 25; i++)
+                {
+                    ParticleManager.AddParticle(new SplortParticle(1, MidPoint, ConsoleColor.Red, 0.3f, 0.3f, 1, MathF.PI, 10, Vector3.UnitY, 6.5f, 15));
+                }
                 isDead = true;
             }
         }
