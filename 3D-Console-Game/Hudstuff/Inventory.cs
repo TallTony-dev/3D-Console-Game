@@ -21,7 +21,7 @@ namespace _3D_Console_Game.Hudstuff
             items.Add(new BoxItem(ConsoleColor.Black));
             items.Add(new BoxItem(ConsoleColor.Blue));
             items.Add(new BoxItem(ConsoleColor.DarkGreen));
-            items.Add(new WeaponItem(ConsoleColor.DarkMagenta, Vector3.Zero));
+            items.Add(new WeaponItem(ConsoleColor.DarkMagenta, Vector3.Zero, 10));
             items.Add(new ShotgunItem(ConsoleColor.DarkGreen, 5));
         }
 
