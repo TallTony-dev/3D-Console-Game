@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -52,6 +53,10 @@ namespace _3D_Console_Game.Engine
 
         Matrix4x4 viewMatrix = Matrix4x4.Identity;
         Matrix4x4 projectionMatrix;
+
+        private static readonly StreamWriter _writer = new StreamWriter(
+            Console.OpenStandardOutput(), new UTF8Encoding(false), 1 << 16)
+        { AutoFlush = false };
 
         public Display(int width, int height)
         {
@@ -371,36 +376,10 @@ namespace _3D_Console_Game.Engine
             buf.Append(fps.ToString());
 
             Console.SetCursorPosition(0, 0);
-            Console.Write(buf.ToString());
+            _writer.Write(buf);
+            _writer.Flush();
         }
 
-        public void DrawWinMenu()
-        {
-            StringBuilder buf = new StringBuilder();
-            int width = values.GetLength(0);
-            int height = values.GetLength(1);
-            buf.Append(GetAnsiForegroundColor(ConsoleColor.Green));
-            buf.Append("YAY YOU WON WOOHOO");
-            buf.Append(RESET);
-
-            Console.Clear();
-            Console.Write(buf.ToString());
-        }
-
-        public void DrawLossMenu(int score)
-        {
-            StringBuilder buf = new StringBuilder();
-            int width = values.GetLength(0);
-            int height = values.GetLength(1);
-            buf.Append(GetAnsiForegroundColor(ConsoleColor.Red));
-            buf.AppendLine("DAMNNNNNN U LOST TWIN");
-            buf.Append(RESET);
-            buf.Append(GetAnsiForegroundColor(ConsoleColor.Green));
-            buf.AppendLine($"Its ok twin atleast u got {score} points :3");
-            buf.Append(RESET);
-
-            Console.Clear();
-            Console.Write(buf.ToString());
-        }
+        
     }
 }

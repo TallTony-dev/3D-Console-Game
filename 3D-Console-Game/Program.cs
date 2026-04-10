@@ -10,6 +10,7 @@ namespace _3D_Console_Game
         {
             double prevTime = (double)DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000;
 
+            Console.OutputEncoding = Encoding.UTF8;
             Console.CursorVisible = false;
             game.InitializeGame();
 
