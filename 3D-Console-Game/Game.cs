@@ -122,6 +122,12 @@ namespace _3D_Console_Game
             state = GameState.inGame;
             InputManager.LockMousePos();
         }
+        public void GoToMainMenu()
+        {
+            display = new Display(Console.WindowWidth, Console.WindowHeight - 1);
+            state = GameState.Menu;
+            InputManager.UnlockMousePos();
+        }
         
         Display display;
         public void DrawGame()

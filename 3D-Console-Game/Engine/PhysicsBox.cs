@@ -48,23 +48,32 @@ namespace _3D_Console_Game.Engine
             return collidedObjects.Contains(obj);
         }
 
+        //LLM: subdivide physics steps to not clip anymore
+        private const float MaxStepTime = 1f / 60f;
+
         public void Update(double deltaTime)
         {
             collidedObjects.Clear();
-            float dt = (float)deltaTime;
+            float remaining = (float)deltaTime;
 
-            velocity.Y -= Gravity * dt;
-            if (isDamped)
+            while (remaining > 0f)
             {
-                velocity.X -= Math.Sign(velocity.X) * Friction * dt;
-                velocity.Z -= Math.Sign(velocity.Z) * Friction * dt;
-                velocityRoll -= velocityRoll * AirFriction * dt;
-                velocityPitch -= velocityPitch * AirFriction * dt;
-                velocityYaw -= velocityYaw * AirFriction * dt;
-            }
+                float dt = Math.Min(remaining, MaxStepTime);
+                remaining -= dt;
 
-            UpdatePos(velocity * dt, velocityRoll * dt, velocityPitch * dt, velocityYaw * dt);
-            CheckCollision();
+                velocity.Y -= Gravity * dt;
+                if (isDamped)
+                {
+                    velocity.X -= Math.Sign(velocity.X) * Friction * dt;
+                    velocity.Z -= Math.Sign(velocity.Z) * Friction * dt;
+                    velocityRoll -= velocityRoll * AirFriction * dt;
+                    velocityPitch -= velocityPitch * AirFriction * dt;
+                    velocityYaw -= velocityYaw * AirFriction * dt;
+                }
+
+                UpdatePos(velocity * dt, velocityRoll * dt, velocityPitch * dt, velocityYaw * dt);
+                CheckCollision();
+            }
         }
 
         private void CheckCollision()
