@@ -18,10 +18,12 @@ namespace _3D_Console_Game.Hudstuff
             inGameHudElements.Add(new HealthBar());
             inGameHudElements.Add(Program.game.player.inventory);
 
-            pauseMenuHudElements.Add(new TextBoxElement(Console.WindowWidth / 2 - 11, 10, HudElement.Origin.TopLeft, "Press esc to resume"));
+            pauseMenuHudElements.Add(new TextBoxElement(Console.WindowWidth / 2 - 10, 10, HudElement.Origin.TopLeft, "Press esc to resume"));
+            pauseMenuHudElements.Add(new Button(Console.WindowWidth / 2 - 12, 15, HudElement.Origin.TopLeft, "click here to main menu", Program.game.GoToMainMenu));
 
-            mainMenuHudElements.Add(new TextBoxElement(Console.WindowWidth / 2 - 11, 10, HudElement.Origin.TopLeft, "Press enter to start"));
-            mainMenuHudElements.Add(new Button(4, 4, HudElement.Origin.TopLeft, "enter game?", Program.game.EnterGame));
+
+            mainMenuHudElements.Add(new TextBoxElement(Console.WindowWidth / 2 - 9, 5, HudElement.Origin.TopLeft, "Tony's awesome game"));
+            mainMenuHudElements.Add(new Button(Console.WindowWidth / 2 - 9, 10, HudElement.Origin.TopLeft, "click here to enter", Program.game.EnterGame));
         }
 
         public static void Update(float dt)
