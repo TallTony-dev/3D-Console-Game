@@ -92,26 +92,7 @@ namespace _3D_Console_Game
             {
                 if (InputManager.IsKeyPressed(ConsoleKey.Enter))
                 {
-                    display = new Display(Console.WindowWidth, Console.WindowHeight - 1);
-                    state = GameState.inGame;
-                    InputManager.LockMousePos();
-                }
-            }
-            else if (state == GameState.Loss)
-            {
-                display.DrawLossMenu(score);
-                if (InputManager.IsKeyPressed(ConsoleKey.Enter))
-                {
-                    state = GameState.Menu;
-                    score = 0;
-                }
-            }
-            else if (state == GameState.Victory)
-            {
-                display.DrawWinMenu();
-                if (InputManager.IsKeyPressed(ConsoleKey.Enter))
-                {
-                    state = GameState.Menu;
+                    EnterGame();
                 }
             }
         }

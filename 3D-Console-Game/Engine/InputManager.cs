@@ -63,8 +63,6 @@ namespace _3D_Console_Game.Engine
         [DllImport("user32.dll")]
         static extern bool GetWindowRect(IntPtr hWnd, out Rect lpRect);
 
-        //[DllImport("user32.dll")]
-        //private static extern int ShowCursor(bool bShow);
 
         [StructLayout(LayoutKind.Sequential)]
         public struct Rect
@@ -74,13 +72,6 @@ namespace _3D_Console_Game.Engine
             public int Right;
             public int Bottom;
         }
-
-        //[DllImport("kernel32.dll", SetLastError = true)]
-        //public static extern IntPtr GetConsoleWindow();
-
-        //[DllImport("user32.dll", SetLastError = true)]
-        //[return: MarshalAs(UnmanagedType.Bool)]
-        //public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
         public static void UpdateMousePos()
         {
@@ -112,11 +103,6 @@ namespace _3D_Console_Game.Engine
                 mouseDelta = new Vector2(center.X - currentPos.X, center.Y - currentPos.Y);
                 SetCursorPos(center.X, center.Y);
             }
-
-            //GetWindowRect(consoleHandle, out RECT rect);
-            //currentPos.X -= rect.Left;
-            //currentPos.Y -= rect.Top;
-            ////currentPos.X /= 12;
         }
 
         //public static void HideCursor()

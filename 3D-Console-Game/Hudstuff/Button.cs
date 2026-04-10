@@ -22,7 +22,7 @@ namespace _3D_Console_Game.Hudstuff
             return (p.X >= x && p.X <= x + width && p.Y >= y && p.Y <= y + height);
         }
 
-        public override void Draw((char c, ConsoleColor col)[,] display)
+        public override void Update(float dt)
         {
             Point mousePos = InputManager.relativeMousePos;
 
@@ -30,7 +30,7 @@ namespace _3D_Console_Game.Hudstuff
             {
                 onClick.Invoke();
             }
-            base.Draw(display);
+            base.Update(dt);
         }
 
     }
