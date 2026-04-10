@@ -340,34 +340,37 @@ namespace _3D_Console_Game.Engine
                 }
             }
 
+            //LLM: optimize calls by reducing escape sequence count
+            ConsoleColor prevFg = (ConsoleColor)(-1);
+            bool prevHasBg = false;
+
             for (int y = 0; y < display.GetLength(1); y++)
             {
                 for (int x = 0; x < display.GetLength(0); x++)
                 {
-                    if (display[x, y].c < 176)
-                        buf.Append($"{ESC}[47{SUFFIX}");
-                    buf.Append(GetAnsiForegroundColor(display[x, y].col));
+                    bool needsBg = display[x, y].c < 176;
+                    ConsoleColor fg = display[x, y].col;
+
+                    if (needsBg != prevHasBg || fg != prevFg)
+                    {
+                        buf.Append(RESET);
+                        if (needsBg)
+                            buf.Append($"{ESC}[47{SUFFIX}");
+                        buf.Append(GetAnsiForegroundColor(fg));
+                        prevFg = fg;
+                        prevHasBg = needsBg;
+                    }
+
                     buf.Append(display[x, y].c);
-                    buf.Append(RESET);
                 }
+                buf.Append(RESET);
+                prevFg = (ConsoleColor)(-1);
+                prevHasBg = false;
                 buf.AppendLine();
             }
             buf.Append(fps.ToString());
 
             Console.SetCursorPosition(0, 0);
-            Console.Write(buf.ToString());
-        }
-
-        public void DrawMenu()
-        {
-            StringBuilder buf = new StringBuilder();
-            int width = values.GetLength(0);
-            int height = values.GetLength(1);
-            buf.Append(GetAnsiForegroundColor(ConsoleColor.Cyan));
-            buf.Append("Welcome to the super cool 3d game, press enter to start");
-            buf.Append(RESET);
-
-            Console.Clear();
             Console.Write(buf.ToString());
         }
 

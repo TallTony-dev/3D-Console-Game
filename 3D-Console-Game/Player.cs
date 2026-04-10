@@ -56,7 +56,7 @@ namespace _3D_Console_Game
 
         public float health { get; private set; }
 
-        public Player(float health, float width = 0.5f, float height = 1.5f, float depth = 0.5f, Vector3 playerPos = default, float moveSpeed = 9f, float rotSpeed = 2f)
+        public Player(float health, float width = 0.5f, float height = 1.5f, float depth = 0.5f, Vector3 playerPos = default, float moveSpeed = 13f, float rotSpeed = 2f)
         {
             this.width = width;
             this.height = height;
@@ -88,6 +88,10 @@ namespace _3D_Console_Game
         }
 
         bool wasTouchingGround = true;
+        bool isSliding = false;
+        bool wasSlideKeyDown = false;
+        bool isSlideKeyPressed = false;
+        float timeSliding = 0;
         double timeSinceWalkParticle = 0;
         public void Update(double deltaTime)
         {
@@ -101,65 +105,6 @@ namespace _3D_Console_Game
 
 
             bool isTouchingGround = playerPos.Y == 0;
-            timeSinceDamageTaken += dt;
-            
-
-            if (InputManager.IsCharPressedAsync('W'))
-            {
-                playerVel += xzForward * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzForward)) + 0.1f);
-            }
-            if (InputManager.IsCharPressedAsync('S'))
-            {
-                playerVel -= xzForward * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzForward)) + 0.1f);
-            }
-            if (InputManager.IsCharPressedAsync('A'))
-            {
-                playerVel += xzLeft * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzLeft)) + 0.1f);
-            }
-            if (InputManager.IsCharPressedAsync('D'))
-            {
-                playerVel -= xzLeft * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzLeft)) + 0.1f);
-            }
-
-            //if (InputManager.IsCharPressedAsync('R'))
-            //{
-            //    Vector3 camPoss = CamPos + Forward;
-            //    ParticleManager.AddParticle(new Bullet(6f, 1, 4, camPoss, Forward, ConsoleColor.Green, false, true));
-            //    //for (int i = 0; i < 3; i++)
-            //    //{
-            //    //    ParticleManager.AddParticle(new SplortParticle(1, CamPos + Forward, ConsoleColor.DarkGreen, 0.1f, 0.1f, 1.4f, 1.4f, 0f, Forward, 5, 0));
-            //    //}
-            //}
-
-            if (InputManager.IsKeyPressed(ConsoleKey.E))
-            {
-                if (heldBox == null) { 
-                    ICollidable? c = Raycast.GetFirstObject(CamPos, Forward, 1);
-                    if (c is Box b && b.isPickable)
-                    {
-                        heldBox = b;
-                    }
-                }
-                else
-                {
-                    heldBox = null;
-                }
-            }
-
-            playerVel -= new Vector3(Math.Sign(playerVel.X) * 2f * dt, dt * 8, Math.Sign(playerVel.Z) * 2f * dt);
-            playerPos += Vector3.Multiply((float)deltaTime, playerVel);
-
-            if (playerPos.Y < 0)
-            {
-                playerPos.Y = 0;
-                playerVel.Y = 0;
-            }
-
-            if (heldBox != null)
-            {
-                heldBox.SetPos(CamPos + (heldBox.Pos - heldBox.MidPoint) + Forward, -MathF.Asin(Forward.Y), 0, MathF.Atan2(Forward.X, Forward.Z));
-            }
-
             Prism hitbox = Hitbox;
 
             foreach (object obj in Game.activeObjects)
@@ -196,6 +141,93 @@ namespace _3D_Console_Game
                     }
                 }
             }
+
+            timeSinceDamageTaken += dt;
+
+
+            bool isSlideKeyDown = InputManager.IsCharPressedAsync(0x11);
+            if (isSlideKeyDown && !wasSlideKeyDown)
+            {
+                isSlideKeyPressed = true;
+            }
+            else isSlideKeyPressed = false;
+            wasSlideKeyDown = isSlideKeyDown;
+
+            if (isTouchingGround && ((isSlideKeyPressed) || (!wasTouchingGround && isSlideKeyDown)) && playerVel.LengthSquared() > 3)
+            {
+                isSliding = true;
+            }
+            else if (!isSlideKeyDown || !isTouchingGround || playerVel.LengthSquared() < 3)
+            {
+                isSliding = false;
+            }
+
+            if (isSliding)
+            {
+                timeSliding += dt;
+                playerVel = Vector3.Normalize(playerVel) * 5;
+            }
+            else
+            {
+                timeSliding = 0;
+                if (InputManager.IsCharPressedAsync('W'))
+                {
+                    playerVel += xzForward * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzForward)) + 0.1f);
+                }
+                if (InputManager.IsCharPressedAsync('S'))
+                {
+                    playerVel -= xzForward * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzForward)) + 0.1f);
+                }
+                if (InputManager.IsCharPressedAsync('A'))
+                {
+                    playerVel += xzLeft * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzLeft)) + 0.1f);
+                }
+                if (InputManager.IsCharPressedAsync('D'))
+                {
+                    playerVel -= xzLeft * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzLeft)) + 0.1f);
+                }
+            }
+
+            //if (InputManager.IsCharPressedAsync('R'))
+            //{
+            //    Vector3 camPoss = CamPos + Forward;
+            //    ParticleManager.AddParticle(new Bullet(6f, 1, 4, camPoss, Forward, ConsoleColor.Green, false, true));
+            //    //for (int i = 0; i < 3; i++)
+            //    //{
+            //    //    ParticleManager.AddParticle(new SplortParticle(1, CamPos + Forward, ConsoleColor.DarkGreen, 0.1f, 0.1f, 1.4f, 1.4f, 0f, Forward, 5, 0));
+            //    //}
+            //}
+
+            if (InputManager.IsKeyPressed(ConsoleKey.E))
+            {
+                if (heldBox == null) { 
+                    ICollidable? c = Raycast.GetFirstObject(CamPos, Forward, 1);
+                    if (c is Box b && b.isPickable)
+                    {
+                        heldBox = b;
+                    }
+                }
+                else
+                {
+                    heldBox = null;
+                }
+            }
+
+            playerVel -= new Vector3(Math.Sign(playerVel.X) * 2f * dt + Math.Sign(playerVel.X) * dt * playerVel.LengthSquared() * 0.3f, dt * 9.8f, Math.Sign(playerVel.Z) * 2f * dt + Math.Sign(playerVel.Z) * dt * playerVel.LengthSquared() * 0.3f);
+            playerPos += Vector3.Multiply((float)deltaTime, playerVel);
+
+            if (playerPos.Y < 0)
+            {
+                playerPos.Y = 0;
+                playerVel.Y = 0;
+            }
+
+            if (heldBox != null)
+            {
+                heldBox.SetPos(CamPos + (heldBox.Pos - heldBox.MidPoint) + Forward, -MathF.Asin(Forward.Y), 0, MathF.Atan2(Forward.X, Forward.Z));
+            }
+
+            
             nearestLookCollision = Raycast.GetFirstObjectCollisionPos(CamPos, Forward, 3f) ?? nearestLookCollision;
 
             if (InputManager.IsCharPressedAsync(0x20) && isTouchingGround)
@@ -228,7 +260,7 @@ namespace _3D_Console_Game
             }
             wasTouchingGround = isTouchingGround;
 
-            CamPos = playerPos + new Vector3(0, 1.3f, 0);
+            CamPos = playerPos + new Vector3(0, (isSliding ? 0.5f + 1 / (timeSliding * 4 + 1) : 1.3f), 0);
 
             Vector2 delta = InputManager.GetMouseDelta();
             
@@ -236,9 +268,18 @@ namespace _3D_Console_Game
             pitch += rotSpeed * dt * delta.Y / 20;
             pitch = Math.Clamp(pitch, -MathF.PI / 2 + 0.01f, MathF.PI / 2 - 0.01f);
 
-            view = Quaternion.CreateFromAxisAngle(Vector3.UnitY, yaw) * Quaternion.CreateFromAxisAngle(Vector3.UnitX, pitch);
+            Quaternion baseView = Quaternion.CreateFromAxisAngle(Vector3.UnitY, yaw) * Quaternion.CreateFromAxisAngle(Vector3.UnitX, pitch);
 
-
+            //Partly LLM: adjust view when sliding
+            if (isSliding)
+            {
+                float slideFactor = (1 - 1 / (timeSliding + 1)) * 0.05f;
+                Vector3 left = Vector3.Transform(-Vector3.UnitX, baseView);
+                float sidewaysSpeed = Vector3.Dot(playerVel, left);
+                float rollAngle = sidewaysSpeed * slideFactor;
+                baseView = baseView * Quaternion.CreateFromAxisAngle(Vector3.UnitZ, rollAngle);
+            }
+            view = baseView;
         }
 
         

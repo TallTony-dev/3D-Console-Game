@@ -8,7 +8,7 @@ namespace _3D_Console_Game.Hudstuff
 {
     internal class TextBoxElement : HudElement
     {
-        string text;
+        protected string text;
 
 
         public TextBoxElement(int x, int y, Origin origin, string text) : base(x, y, origin, text.Length + 1, 2)

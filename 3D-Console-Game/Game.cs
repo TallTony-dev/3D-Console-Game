@@ -45,10 +45,10 @@ namespace _3D_Console_Game
             display.fps = (int)(1 / deltaTime);
             Hudstuff.HUD.Update((float)deltaTime);
             display.Update(deltaTime, player);
-
+            InputManager.UpdateMousePos();
             if (state == GameState.inGame)
             {
-                InputManager.UpdateMousePos();
+
                 ParticleManager.UpdateParticles(deltaTime);
 
                 for (int i = 0; i < activeObjects.Count; i++)
@@ -116,7 +116,12 @@ namespace _3D_Console_Game
             }
         }
 
-
+        public void EnterGame()
+        {
+            display = new Display(Console.WindowWidth, Console.WindowHeight - 1);
+            state = GameState.inGame;
+            InputManager.LockMousePos();
+        }
         
         Display display;
         public void DrawGame()
