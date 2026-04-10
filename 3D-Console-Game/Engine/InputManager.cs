@@ -17,6 +17,7 @@ namespace _3D_Console_Game.Engine
         static ConsoleKeyInfo previousKey = default;
 
         static Point currentPos;
+        public static Point relativeMousePos;
         static Vector2 mouseDelta;
         static bool isLeftMousePressed = false;
         static bool isLeftMouseDown = false;
@@ -56,17 +57,23 @@ namespace _3D_Console_Game.Engine
         static extern bool SetCursorPos(int X, int Y);
         [DllImport("user32.dll")]
         private static extern short GetAsyncKeyState(int vKey);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+        [DllImport("user32.dll")]
+        static extern bool GetWindowRect(IntPtr hWnd, out Rect lpRect);
+
         //[DllImport("user32.dll")]
         //private static extern int ShowCursor(bool bShow);
 
-        //[StructLayout(LayoutKind.Sequential)]
-        //public struct RECT
-        //{
-        //    public int Left;
-        //    public int Top;
-        //    public int Right;
-        //    public int Bottom;
-        //}
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Rect
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
 
         //[DllImport("kernel32.dll", SetLastError = true)]
         //public static extern IntPtr GetConsoleWindow();
@@ -77,6 +84,10 @@ namespace _3D_Console_Game.Engine
 
         public static void UpdateMousePos()
         {
+            IntPtr consoleWindowHandle = GetForegroundWindow();
+            Rect screenRect;
+            GetWindowRect(consoleWindowHandle, out screenRect);
+
             if (InputManager.IsCharPressedAsync(0x01))
             {
                 if (!isLeftMouseDown && !isLeftMousePressed)
@@ -91,10 +102,15 @@ namespace _3D_Console_Game.Engine
             else { isLeftMouseDown = false; }
             GetCursorPos(ref currentPos);
 
+            float widthScale = (float)(screenRect.Right - screenRect.Left) / Console.WindowWidth;
+            float heightScale = (float)(screenRect.Bottom - screenRect.Top) / Console.WindowHeight;
+            relativeMousePos = new Point((int)((currentPos.X - screenRect.Left) / widthScale),(int)((currentPos.Y - screenRect.Top) / heightScale));
+
+            Point center = new Point((screenRect.Left + screenRect.Right) / 2, (screenRect.Top + screenRect.Bottom) / 2);
             if (lockMousePos)
             {
-                mouseDelta = new Vector2(500 - currentPos.X, 500 - currentPos.Y);
-                SetCursorPos(500, 500);
+                mouseDelta = new Vector2(center.X - currentPos.X, center.Y - currentPos.Y);
+                SetCursorPos(center.X, center.Y);
             }
 
             //GetWindowRect(consoleHandle, out RECT rect);
