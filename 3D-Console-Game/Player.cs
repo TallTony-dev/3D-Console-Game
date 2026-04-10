@@ -225,6 +225,10 @@ namespace _3D_Console_Game
             if (heldBox != null)
             {
                 heldBox.SetPos(CamPos + (heldBox.Pos - heldBox.MidPoint) + Forward, -MathF.Asin(Forward.Y), 0, MathF.Atan2(Forward.X, Forward.Z));
+                if (heldBox is PhysicsBox phys)
+                {
+                    phys.SetVelocity(Vector3.Zero);
+                }
             }
 
             

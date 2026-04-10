@@ -41,7 +41,10 @@ namespace _3D_Console_Game.Engine
 
             velocity += force;
         }
-
+        public void SetVelocity(Vector3 xyz)
+        {
+            velocity = xyz;
+        }
 
         public bool CollidedWithObject(object obj)
         {
