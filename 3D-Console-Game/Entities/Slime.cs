@@ -13,7 +13,7 @@ namespace _3D_Console_Game.Entities
     internal class Slime : Enemy
     {
 
-        public Slime(Vector3 pos) : base(new PhysicsBox(pos, 0.4f, 0.4f, 0.4f, ConsoleColor.Green, 0, true), 100)
+        public Slime(Vector3 pos) : base(new PhysicsBox(pos, 0.4f, 0.4f, 0.4f, ConsoleColor.Green, 0.3f, 0, true), 100)
         {
             body.Friction = 5;
         }

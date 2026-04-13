@@ -21,7 +21,7 @@ namespace _3D_Console_Game.Items
         Random rand = new Random();
         int numShots;
         float spread;
-        public ShotgunItem(ConsoleColor col, float damage, float spread = 0.2f, int numShots = 6) : base(col, Vector3.Zero, damage, 1, 12, 0.5f)
+        public ShotgunItem(Player player, ConsoleColor col, float damage, float spread = 0.2f, int numShots = 6) : base(player, col, Vector3.Zero, damage, 1, 12, 0.5f)
         {
             this.numShots = numShots;
             this.spread = spread;

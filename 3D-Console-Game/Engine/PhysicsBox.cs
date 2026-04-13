@@ -8,13 +8,15 @@ using System.Threading.Tasks;
 
 namespace _3D_Console_Game.Engine
 {
-    internal class PhysicsBox : Box, IUpdatable
+    internal class PhysicsBox : Box, IUpdatable, IPushable
     {
-        public PhysicsBox(Vector3 pos, float width, float height, float length, ConsoleColor col, float pitch = 0, bool isDamped = true) : base(pos, width, height, length, col, pitch)
+        public PhysicsBox(Vector3 pos, float width, float height, float length, ConsoleColor col, float mass, float pitch = 0, bool isDamped = true) : base(pos, width, height, length, col, pitch)
         {
+            this.mass = mass;
             this.isDamped = isDamped;
         }
 
+        float mass = 0.5f;
         List<object> collidedObjects = new();
         public Vector3 velocity;
         float velocityRoll;
@@ -27,6 +29,10 @@ namespace _3D_Console_Game.Engine
         public float Friction = 2f;
         private const float Bounciness = 1f;
         private const float AirFriction = 1f;
+        public void ApplyForce(Vector3 forceDir, float forceStrength, Vector3 source)
+        {
+            velocity += forceDir * forceStrength / mass;
+        }
         public void CollideWithPhysics(Vector3 forceDir, float strength, Vector3 collisionPoint)
         {
             Vector3 thisMid = hitbox.MidPoint;

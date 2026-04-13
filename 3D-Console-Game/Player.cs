@@ -11,7 +11,7 @@ using _3D_Console_Game.Hudstuff;
 
 namespace _3D_Console_Game
 {
-    internal class Player : IUpdatable
+    internal class Player : IUpdatable, IPushable
     {
         float width = 0.8f;
         float height = 2;
@@ -24,12 +24,13 @@ namespace _3D_Console_Game
                 return new Prism(pos, width, height, depth);
             }
         }
+        public Vector3 MidPoint => Hitbox.MidPoint;
         public Vector3 Forward { get { return Vector3.Transform(-Vector3.UnitZ, view); } }
         public Vector3 Left { get { return Vector3.Transform(-Vector3.UnitX, view); } }
         public Vector3 nearestLookCollision = Vector3.Zero;
 
         List<object> collidedObjects = new();
-        public Inventory inventory { get; private set; } = new();
+        public Inventory inventory { get; private set; }
         public Quaternion view { get; private set; } = Quaternion.Identity;
         float yaw = 0f;
         float pitch = 0f;
@@ -65,6 +66,7 @@ namespace _3D_Console_Game
             this.moveSpeed = moveSpeed;
             this.rotSpeed = rotSpeed;
             this.health = health;
+            inventory = new(this);
         }
 
         float timeSinceDamageTaken = 10;
@@ -213,7 +215,13 @@ namespace _3D_Console_Game
                 }
             }
 
-            playerVel -= new Vector3(Math.Sign(playerVel.X) * 2f * dt + Math.Sign(playerVel.X) * dt * playerVel.LengthSquared() * 0.3f, dt * 9.8f, Math.Sign(playerVel.Z) * 2f * dt + Math.Sign(playerVel.Z) * dt * playerVel.LengthSquared() * 0.3f);
+            playerVel -= new Vector3(Math.Sign(playerVel.X) * dt * playerVel.Length(), dt * 9.8f, Math.Sign(playerVel.Z) * dt * playerVel.Length());
+
+            if (isTouchingGround)
+            {
+                playerVel -= new Vector3(Math.Sign(playerVel.X) * 2f * dt + Math.Sign(playerVel.X) * dt * playerVel.LengthSquared() * 0.2f, 0, Math.Sign(playerVel.Z) * 2f * dt + Math.Sign(playerVel.Z) * dt * playerVel.LengthSquared() * 0.2f);
+            }
+
             playerPos += Vector3.Multiply((float)deltaTime, playerVel);
 
             if (playerPos.Y < 0)
@@ -286,6 +294,9 @@ namespace _3D_Console_Game
             view = baseView;
         }
 
-        
+        public void ApplyForce(Vector3 forceDir, float forceStrength, Vector3 source)
+        {
+            playerVel += forceDir * forceStrength;
+        }
     }
 }

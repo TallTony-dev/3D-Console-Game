@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace _3D_Console_Game.Entities
 {
-    internal class Entity : ICollidable, IUpdatable, IDrawable
+    internal class Entity : ICollidable, IUpdatable, IDrawable, IPushable
     {
 
         public float health { get; protected set; }
@@ -25,6 +25,10 @@ namespace _3D_Console_Game.Entities
             this.body = body;
         }
 
+        public void ApplyForce(Vector3 forceDir, float forceStrength, Vector3 source)
+        {
+            body.CollideWithPhysics(forceDir, forceStrength, source);
+        }
 
         public virtual void Update(double dt)
         {
