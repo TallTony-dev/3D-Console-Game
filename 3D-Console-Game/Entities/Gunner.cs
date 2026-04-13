@@ -12,7 +12,7 @@ namespace _3D_Console_Game.Entities
 {
     internal class Gunner : Enemy
     {
-        public Gunner(Vector3 pos) : base(new PhysicsBox(pos, 0.4f, 1.8f, 0.4f, ConsoleColor.Black, 0, true), 100)
+        public Gunner(Vector3 pos) : base(new PhysicsBox(pos, 0.4f, 1.8f, 0.4f, ConsoleColor.Black, 0.6f, 0, true), 100)
         {
             body.Friction = 1.5f;
             gun = new Box(pos + new Vector3(0, 1.4f, 0), 0.3f, 0.1f, 1f, ConsoleColor.Gray, Vector3.UnitZ);

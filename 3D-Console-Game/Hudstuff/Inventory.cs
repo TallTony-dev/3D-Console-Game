@@ -16,13 +16,14 @@ namespace _3D_Console_Game.Hudstuff
         public int selectedItem = 0;
         private int prevSelectedItem = 0;
 
-        public Inventory() : base((Console.WindowWidth) / 2 - 40, 0, Origin.BottomLeft, 80, 4)
+        public Inventory(Player p) : base((Console.WindowWidth) / 2 - 40, 0, Origin.BottomLeft, 80, 4)
         {
-            items.Add(new BoxItem(ConsoleColor.Black));
-            items.Add(new BoxItem(ConsoleColor.Blue));
-            items.Add(new BoxItem(ConsoleColor.DarkGreen));
-            items.Add(new WeaponItem(ConsoleColor.DarkMagenta, Vector3.Zero, 10));
-            items.Add(new ShotgunItem(ConsoleColor.DarkGreen, 5));
+            items.Add(new BoxPlaceItem(ConsoleColor.Black, p));
+            items.Add(new BoxPlaceItem(ConsoleColor.Blue, p));
+            items.Add(new BoxPlaceItem(ConsoleColor.DarkGreen, p));
+            items.Add(new WeaponItem(p, ConsoleColor.DarkMagenta, Vector3.Zero, 10));
+            items.Add(new ShotgunItem(p, ConsoleColor.DarkGreen, 5));
+            items.Add(new GrapplingItem(p, 6f));
         }
 
         public override void Update(float dt)

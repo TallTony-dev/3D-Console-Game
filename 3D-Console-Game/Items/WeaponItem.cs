@@ -5,7 +5,7 @@ using System.Numerics;
 
 namespace _3D_Console_Game.Items
 {
-    internal class WeaponItem : InventoryItem
+    internal class WeaponItem : BoxHeldItem
     {
         static readonly char[,] texture =
         {
@@ -15,17 +15,14 @@ namespace _3D_Console_Game.Items
             { '!', '▓', '▓', }
         };
 
-        protected Box box;
-        Vector3 posOffset;
         protected float damage;
         protected float duration;
         protected float velocity;
         protected float timeBetweenShots;
 
-        public WeaponItem(ConsoleColor col, Vector3 posOffset, float damage = 1, float duration = 4, float velocity = 8, float timeBetweenShots = 0.2f, float width = 0.5f, float height = 0.5f, float length = 1f) : base(col, texture)
+        public WeaponItem(Player player, ConsoleColor col, Vector3 posOffset, float damage = 1, float duration = 4, float velocity = 8, float timeBetweenShots = 0.2f, float width = 0.5f, float height = 0.5f, float length = 1f) : base(player, col, Vector3.Zero, texture)
         {
             box = new Box(Vector3.Zero, width, height, length, col);
-            this.posOffset = posOffset;
             this.damage = damage;
             this.duration = duration;
             this.velocity = velocity;
@@ -42,19 +39,16 @@ namespace _3D_Console_Game.Items
             }
         }
 
-        float timeSinceShot;
+        public float TimeSinceShot => timeSinceShot;
+        protected float timeSinceShot;
         public override void Update(float dt)
         {
             if (isSelected)
             {
                 base.Update(dt);
                 timeSinceShot += dt;
-                Vector3 dir = Program.game.player.Forward;
-
-                Vector3 adjGun = Vector3.Transform(new Vector3(0, 0.2f + 0.4f / (timeSinceShot * 4 + 0.3f), -5f), Program.game.player.view);
-                box.SetPos(Program.game.player.CamPos + Vector3.Transform(new Vector3(1f,-0.7f,0f) + posOffset, Program.game.player.view), 
-                    Vector3.Normalize(dir + adjGun));
-
+                Vector3 adjGun = Vector3.Transform(new Vector3(0, 0.4f / (TimeSinceShot * 4 + 0.3f), -5f), owner.view);
+                dirOffset = adjGun * 4;
                 if (InputManager.IsCharPressedAsync('R'))
                 {
                     //reload here maybe
@@ -62,7 +56,7 @@ namespace _3D_Console_Game.Items
 
                 if (InputManager.IsLeftMouseDown() && timeSinceShot > timeBetweenShots)
                 {
-                    Shoot(dir + 0.3f * adjGun, box.MidBack * 0.3f + Program.game.player.CamPos * 0.7f);
+                    Shoot(owner.Forward + 0.3f * Vector3.Transform(new Vector3(0, 0.2f / (TimeSinceShot * 4 + 0.3f), -5f), owner.view), box.MidBack * 0.3f + owner.CamPos * 0.7f);
                     timeSinceShot = 0;
                 }
 
@@ -71,10 +65,7 @@ namespace _3D_Console_Game.Items
 
         public override void Draw(Display display)
         {
-            if (isSelected)
-            {
-                box.Draw(display);
-            }
+            base.Draw(display);
         }
 
 

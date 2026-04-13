@@ -12,6 +12,7 @@ namespace _3D_Console_Game.Items
     {
         public int count = 1;
         protected bool isSelected = false;
+        protected Player owner;
 
         protected char[,] tex =
         {
@@ -23,10 +24,11 @@ namespace _3D_Console_Game.Items
         
         protected ConsoleColor col;
 
-        public InventoryItem(ConsoleColor col, char[,] tex)
+        public InventoryItem(ConsoleColor col, char[,] tex, Player player)
         {
             this.col = col;
             this.tex = tex;
+            owner = player;
         }
 
         public void Deselect()

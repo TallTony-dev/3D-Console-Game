@@ -10,7 +10,7 @@ namespace _3D_Console_Game.Particles
 {
     internal class BoxParticle : Particle
     {
-        protected Box box;
+        public Box box { get; protected set; }
         Vector3 velocity;
 
         public BoxParticle(float duration, Box box, Vector3 velocity) : base(duration)

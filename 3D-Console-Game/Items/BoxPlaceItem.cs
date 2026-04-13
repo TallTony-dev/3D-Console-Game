@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace _3D_Console_Game.Items
 {
-    internal class BoxItem : InventoryItem, IDrawable
+    internal class BoxPlaceItem : InventoryItem, IDrawable
     {
         static readonly char[,] texture =
         {
@@ -20,7 +20,7 @@ namespace _3D_Console_Game.Items
 
         Box box;
 
-        public BoxItem(ConsoleColor boxCol) : base(boxCol, texture)
+        public BoxPlaceItem(ConsoleColor boxCol, Player player) : base(boxCol, texture, player)
         {
             box = new Box(Vector3.Zero, 1, 1, 1, boxCol);
         }

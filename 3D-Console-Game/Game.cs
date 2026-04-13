@@ -27,9 +27,9 @@ namespace _3D_Console_Game
         {
             activeObjects.Add(player);
             activeObjects.Add(new Box(new Vector3(3, 0, 0), 3, 1, 4, ConsoleColor.Magenta));
-            activeObjects.Add(new Box(new Vector3(-3, 0, 0), 3, 1, 10, ConsoleColor.Magenta, -0.385398f));
+            activeObjects.Add(new Box(new Vector3(-3, 0, 0), 3, 1, 100, ConsoleColor.Magenta, -0.385398f));
             for (int i = 0; i < 15; i++)
-                activeObjects.Add(new PhysicsBox(new Vector3(i * 0.6f, i * 0.6f, -2), 0.5f, 0.5f, 0.5f, ConsoleColor.Blue, 0f) { isPickable = true });
+                activeObjects.Add(new PhysicsBox(new Vector3(i * 0.6f, i * 0.6f, -2), 0.5f, 0.5f, 0.5f, ConsoleColor.Blue, 2f, 0f) { isPickable = true });
             activeObjects.Add(new Box(new Vector3(-1000, 0f, -1000), 2000, 0, 2000, ConsoleColor.White));
             activeObjects.Add(new Slime(new Vector3(1, 4f, 0)));
             activeObjects.Add(new Gunner(new Vector3(2, 3, 0)));
