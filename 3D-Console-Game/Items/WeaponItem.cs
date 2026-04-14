@@ -58,7 +58,7 @@ namespace _3D_Console_Game.Items
                 {
                     Vector3 shotPos = box.MidBack * 0.3f + owner.CamPos * 0.7f;
                     Vector3 recoil = Vector3.Transform(new Vector3(-0.2f, 0, 0f), owner.view) + adjGun;
-                    Vector3 shotDir = Vector3.Normalize(owner.Forward + 0.1f * recoil);
+                    Vector3 shotDir = Vector3.Normalize(owner.Forward + 0.3f * recoil);
                     Shoot(shotDir, shotPos);
                     timeSinceShot = 0;
                 }
