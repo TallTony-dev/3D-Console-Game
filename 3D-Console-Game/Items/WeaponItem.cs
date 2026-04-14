@@ -33,9 +33,9 @@ namespace _3D_Console_Game.Items
         {
             Vector3 gunFront = box.MidBack;
             ParticleManager.AddParticle(new Bullet(duration, damage, velocity, pos, dir, col, false, true));
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 6; i++)
             {
-                ParticleManager.AddParticle(new SplortParticle(1, gunFront, ConsoleColor.DarkGreen, 0.1f, 0.1f, 0.5f, 0.5f, 0f, dir, 5, 0));
+                ParticleManager.AddParticle(new SplortParticle(0.4f, gunFront, ConsoleColor.DarkGreen, 0.1f, 0.1f, 0.5f, 0.5f, 0f, dir, 18, 0));
             }
         }
 
@@ -47,8 +47,8 @@ namespace _3D_Console_Game.Items
             {
                 base.Update(dt);
                 timeSinceShot += dt;
-                Vector3 adjGun = Vector3.Transform(new Vector3(0, 0.4f / (TimeSinceShot * 4 + 0.3f), -5f), owner.view);
-                dirOffset = adjGun * 4;
+                Vector3 adjGun = Vector3.Transform(new Vector3(0, 0.4f / (TimeSinceShot * 4 + 0.3f), 0), owner.view);
+                dirOffset = adjGun * 3;
                 if (InputManager.IsCharPressedAsync('R'))
                 {
                     //reload here maybe
@@ -56,7 +56,10 @@ namespace _3D_Console_Game.Items
 
                 if (InputManager.IsLeftMouseDown() && timeSinceShot > timeBetweenShots)
                 {
-                    Shoot(owner.Forward + 0.3f * Vector3.Transform(new Vector3(0, 0.2f / (TimeSinceShot * 4 + 0.3f), -5f), owner.view), box.MidBack * 0.3f + owner.CamPos * 0.7f);
+                    Vector3 shotPos = box.MidBack * 0.3f + owner.CamPos * 0.7f;
+                    Vector3 recoil = Vector3.Transform(new Vector3(-0.2f, 0, 0f), owner.view) + adjGun;
+                    Vector3 shotDir = Vector3.Normalize(owner.Forward + 0.1f * recoil);
+                    Shoot(shotDir, shotPos);
                     timeSinceShot = 0;
                 }
 

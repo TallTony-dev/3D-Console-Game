@@ -151,10 +151,11 @@ namespace _3D_Console_Game.Engine
                         float w1 = CAP / triArea;
                         float w2 = ABP / triArea;
 
-                        float dist = w0 * a.Z + w1 * b.Z + w2 * c.Z;
-                        if (dist < values[x, y].distFromCam)
+                        // LLM: Interpolate 1/W for depth testing: linear in screen space, uniform precision at all distances
+                        float oneOverW = w0 / a.W + w1 / b.W + w2 / c.W;
+                        if (oneOverW > values[x, y].distFromCam)
                         {
-                            values[x, y].distFromCam = dist;
+                            values[x, y].distFromCam = oneOverW;
                             float absABP = MathF.Abs(ABP);
                             float absBCP = MathF.Abs(BCP);
                             float absCAP = MathF.Abs(CAP);
@@ -298,7 +299,7 @@ namespace _3D_Console_Game.Engine
         {
             for (int x = 0; x < values.GetLength(0); x++)
                 for (int y = 0; y < values.GetLength(1); y++)
-                    values[x, y].distFromCam = float.MaxValue;
+                    values[x, y].distFromCam = 0f;
         }
 
         private char MapToChar(float fullness)
@@ -318,13 +319,18 @@ namespace _3D_Console_Game.Engine
 
             Hudstuff.HUD.DrawHUD(display);
 
-            float maxDist = 0;
+            float maxLinearDist = 0;
             for (int x = 0; x < values.GetLength(0); x++)
             {
                 for (int y = 0; y < values.GetLength(1); y++)
                 {
-                    if (values[x, y].distFromCam != float.MaxValue && values[x, y].distFromCam > maxDist)
-                        maxDist = values[x, y].distFromCam;
+                    //LLM: Use  linear dist instead of other way
+                    if (values[x, y].distFromCam > 0)
+                    {
+                        float linearDist = 1f / values[x, y].distFromCam;
+                        if (linearDist > maxLinearDist)
+                            maxLinearDist = linearDist;
+                    }
                 }
             }
 
@@ -336,10 +342,14 @@ namespace _3D_Console_Game.Engine
                     if (display[x, y] == default)
                     {
                         (float strength, ConsoleColor color, float distFromCam) value = values[x, y];
-                        if (maxDist == 0 || value.distFromCam == float.MaxValue)
+                        if (maxLinearDist == 0 || value.distFromCam == 0)
                             display[x, y].c = MapToChar(0);
                         else
-                            display[x, y].c = MapToChar((value.distFromCam / maxDist + value.strength) / 2);
+                        {
+                            //LLM: use linear dist here
+                            float linearDist = 1f / value.distFromCam;
+                            display[x, y].c = MapToChar((linearDist / maxLinearDist + value.strength) / 2);
+                        }
                         display[x, y].col = value.color;
                     }
                 }
