@@ -19,7 +19,7 @@ namespace _3D_Console_Game.Items
             { 'P', '▓', '▓', }
         };
 
-        public GrapplingItem(Player player, float duration, float velocity = 25f) : base(player, ConsoleColor.Black, Vector3.Zero, texture)
+        public GrapplingItem(Player player, float duration, float velocity = 40f) : base(player, ConsoleColor.Black, Vector3.Zero, texture)
         {
             this.duration = duration;
             this.velocity = velocity;
@@ -30,6 +30,7 @@ namespace _3D_Console_Game.Items
         private object? grappledObject;
         private bool isGrappled = false;
         private bool isGrappleShot = false;
+        private float timeSinceGrappleShot = 10;
         private Box grappleBox = new Box(Vector3.Zero, 0, 0, 0, ConsoleColor.White);
         private Bullet grappleBullet = new(0, 0, 0, Vector3.Zero, Vector3.Zero, ConsoleColor.Blue, false, false);
 
@@ -51,14 +52,22 @@ namespace _3D_Console_Game.Items
             base.Update(dt);
             if (isSelected)
             {
+                Vector3 adjGun = Vector3.Transform(new Vector3(0, 0.4f / (timeSinceGrappleShot * 4 + 0.3f), 0), owner.view);
+                dirOffset = adjGun * 3;
                 if (!isGrappled)
                 {
+                    timeSinceGrappleShot += dt;
+
                     if (!isGrappleShot)
                     {
                         if (InputManager.IsLeftMousePressed())
                         {
+                            timeSinceGrappleShot = 0;
                             isGrappleShot = true;
-                            grappleBullet = new Bullet(duration, 0, velocity, box.MidBack * 0.3f + owner.CamPos * 0.7f, owner.Forward + 0.3f * Vector3.Transform(new Vector3(0, 0.2f, -5f), owner.view), ConsoleColor.Cyan, false, false, 0.3f, 0.3f, 0.1f);
+                            Vector3 shotPos = box.MidBack * 0.3f + owner.CamPos * 0.7f;
+                            Vector3 recoil = Vector3.Transform(new Vector3(-0.2f, 0, 0f), owner.view) + adjGun;
+                            Vector3 shotDir = Vector3.Normalize(owner.Forward + 0.3f * recoil);
+                            grappleBullet = new Bullet(duration, 0, velocity, shotPos, shotDir, ConsoleColor.Cyan, false, false, 0.3f, 0.3f, 0.1f);
                         }
                     }
                     if (isGrappleShot)
