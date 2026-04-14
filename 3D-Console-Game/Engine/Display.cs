@@ -347,8 +347,8 @@ namespace _3D_Console_Game.Engine
                         else
                         {
                             //LLM: use linear dist here
-                            float linearDist = 1f / value.distFromCam;
-                            display[x, y].c = MapToChar((linearDist / maxLinearDist + value.strength) / 2);
+                            //float linearDist = 1f / value.distFromCam;
+                            display[x, y].c = MapToChar(/*linearDist / maxLinearDist + */value.strength * 2);
                         }
                         display[x, y].col = value.color;
                     }
