@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using _3D_Console_Game.Engine;
 using _3D_Console_Game.Particles;
+using _3D_Console_Game.Sound;
 
 namespace _3D_Console_Game.Entities
 {
@@ -24,6 +25,10 @@ namespace _3D_Console_Game.Entities
         public override void TakeDamage(float damage, Vector3 sourcePos)
         {
             base.TakeDamage(damage, sourcePos);
+            if (timeSinceTakenDamage > 0.2)
+            {
+                SoundPlayer.PlaySound("smallhurt1.wav", 0.4f);
+            }
             timeSinceTakenDamage = 0;
         }
 
@@ -80,6 +85,7 @@ namespace _3D_Console_Game.Entities
                 {
                     ParticleManager.AddParticle(new SplortParticle(1, bot, ConsoleColor.Green, 0.4f, 0.4f, 1, MathF.PI, 10, Vector3.UnitY, 5, 15));
                 }
+                SoundPlayer.PlaySound("slimebounce1.wav");
             }
 
         }

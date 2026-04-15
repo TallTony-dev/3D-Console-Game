@@ -49,6 +49,7 @@ namespace _3D_Console_Game.Entities
         public virtual void TakeDamage(float damage, Vector3 sourcePos)
         {
             health -= damage;
+            
             if (health <= 0)
             {
                 for (int i = 0; i < 25; i++)
