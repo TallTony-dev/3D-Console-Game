@@ -149,6 +149,7 @@ namespace _3D_Console_Game
 
             timeSinceDamageTaken += dt;
 
+            
 
             bool isSlideKeyDown = InputManager.IsCharPressedAsync(0x11);
             if (isSlideKeyDown && !wasSlideKeyDown)
@@ -265,15 +266,28 @@ namespace _3D_Console_Game
                     SoundPlayer.PlaySound("boxcollide.wav");
                 }
                 timeSinceWalkParticle += deltaTime * playerVel.Length();
-                if (timeSinceWalkParticle > 0.7f)
+                if (!isSliding)
                 {
-                    for (int i = 0; i < playerVel.Length() - 0.6f; i++)
+                    if (timeSinceWalkParticle > 0.7f)
                     {
-                        ParticleManager.AddParticle(new SplortParticle(1, playerPos + new Vector3(width / 2, 0, depth / 2), ConsoleColor.Yellow, 0.1f, 0.1f, 0.3f, 0.3f, 10, Vector3.Normalize(-playerVel + new Vector3(0, 2f, 0)), 4f, 15));
+                        for (int i = 0; i < playerVel.Length() - 0.6f; i++)
+                        {
+                            ParticleManager.AddParticle(new SplortParticle(1, playerPos + new Vector3(width / 2, 0, depth / 2), ConsoleColor.Yellow, 0.1f, 0.1f, 0.3f, 0.3f, 10, Vector3.Normalize(-playerVel + new Vector3(0, 2f, 0)), 4f, 15));
+                        }
+                        SoundPlayer.PlaySound("step.wav", 0.3f);
+                        timeSinceWalkParticle = 0;
                     }
-                    SoundPlayer.PlaySound("step.wav", 0.3f);
-                    timeSinceWalkParticle = 0;
                 }
+                else
+                {
+                    if (timeSinceWalkParticle > 0.947f)
+                    {
+                        SoundPlayer.PlaySound("slide1.wav", 0.3f);
+                        timeSinceWalkParticle = 0;
+                    }
+                }
+
+
             }
             wasTouchingGround = isTouchingGround;
 

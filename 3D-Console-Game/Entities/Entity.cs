@@ -13,6 +13,7 @@ namespace _3D_Console_Game.Entities
     {
 
         public float health { get; protected set; }
+        protected double timeSinceTakenDamage { get; private set; } = 10;
 
         protected PhysicsBox body;
         public PhysicsBox Body => body;
@@ -32,6 +33,7 @@ namespace _3D_Console_Game.Entities
 
         public virtual void Update(double dt)
         {
+            timeSinceTakenDamage += dt;
             body.Update(dt);
         }
 
@@ -49,7 +51,7 @@ namespace _3D_Console_Game.Entities
         public virtual void TakeDamage(float damage, Vector3 sourcePos)
         {
             health -= damage;
-            
+            timeSinceTakenDamage = 0;
             if (health <= 0)
             {
                 for (int i = 0; i < 25; i++)

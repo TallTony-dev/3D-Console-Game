@@ -32,6 +32,7 @@ namespace _3D_Console_Game.Entities
 
         public override void Update(double dt)
         {
+            base.Update(dt);
             Player player = Program.game.player;
             Vector3 target = player.Hitbox.MidPoint;
             timeSinceTakenDamage += dt;
@@ -53,7 +54,6 @@ namespace _3D_Console_Game.Entities
             body.velocity = Vector3.Clamp(targetDir * ( toTargetFromBody.LengthSquared() - 23) * 0.2f, new Vector3(-10,0,-10),new Vector3(10,0,10)) + new Vector3(0,body.velocity.Y,0);
 
             gun.SetPos(body.Pos + new Vector3(0, 1.4f, 0), gunAimDir);
-            body.Update(dt);
         }
 
         public override void Draw(Display display)

@@ -19,21 +19,20 @@ namespace _3D_Console_Game.Entities
             body.Friction = 5;
         }
 
-        double timeSinceTakenDamage = 10;
         float animTime = 0;
 
         public override void TakeDamage(float damage, Vector3 sourcePos)
         {
             base.TakeDamage(damage, sourcePos);
-            if (timeSinceTakenDamage > 0.2)
+            if (timeSinceTakenDamage > 0.1)
             {
                 SoundPlayer.PlaySound("smallhurt1.wav", 0.4f);
             }
-            timeSinceTakenDamage = 0;
         }
 
         public override void Update(double dt)
         {
+            base.Update(dt);
             animTime += (float)dt;
             if (timeSinceTakenDamage < 0.1f)
             {
@@ -43,8 +42,6 @@ namespace _3D_Console_Game.Entities
             {
                 body.col = ConsoleColor.Green;
             }
-            timeSinceTakenDamage += dt;
-
 
             Player player = Program.game.player;
             Vector3 target = player.Hitbox.MidPoint;
@@ -54,8 +51,6 @@ namespace _3D_Console_Game.Entities
                 player.TakeDamage(5, MidPoint);
                 
             }
-
-            body.Update(dt);
 
             if (animTime > 3 && animTime < 4)
             {
@@ -85,7 +80,7 @@ namespace _3D_Console_Game.Entities
                 {
                     ParticleManager.AddParticle(new SplortParticle(1, bot, ConsoleColor.Green, 0.4f, 0.4f, 1, MathF.PI, 10, Vector3.UnitY, 5, 15));
                 }
-                SoundPlayer.PlaySound("slimebounce1.wav");
+                SoundPlayer.PlaySoundFromPos("slimebounce1.wav", body.Pos);
             }
 
         }
