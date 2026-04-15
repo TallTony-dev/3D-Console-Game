@@ -8,6 +8,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using _3D_Console_Game.Hudstuff;
+using _3D_Console_Game.Sound;
 
 namespace _3D_Console_Game
 {
@@ -97,7 +98,9 @@ namespace _3D_Console_Game
         double timeSinceWalkParticle = 0;
         public void Update(double deltaTime)
         {
+            List<object> lastCollidedObjects = new List<object>(collidedObjects);
             collidedObjects.Clear();
+
             float dt = (float)deltaTime;
 
             Vector3 xzForwardRaw = Forward * new Vector3(1, 0, 1);
@@ -116,8 +119,8 @@ namespace _3D_Console_Game
                     (bool collides, Vector3 dirOut, float penetration, Vector3 collisionPoint) = collidable.CollidesWith(Hitbox);
                     if (collides)
                     {
-                        collidedObjects.Add(obj);
 
+                        collidedObjects.Add(obj);
                         if (obj is PhysicsBox phys)
                         {
                             phys.CollideWithPhysics(-dirOut, penetration * 100, collisionPoint);
@@ -259,14 +262,16 @@ namespace _3D_Console_Game
                     {
                         ParticleManager.AddParticle(new SplortParticle(1, playerPos + new Vector3(width / 2, 0, depth / 2), ConsoleColor.DarkBlue, 0.3f, 0.3f, 1, MathF.PI, 10, Vector3.UnitY, 6.5f, 15));
                     }
+                    SoundPlayer.PlaySound("boxcollide.wav");
                 }
-                timeSinceWalkParticle += deltaTime;
-                if (timeSinceWalkParticle > 0.2)
+                timeSinceWalkParticle += deltaTime * playerVel.Length();
+                if (timeSinceWalkParticle > 0.7f)
                 {
                     for (int i = 0; i < playerVel.Length() - 0.6f; i++)
                     {
                         ParticleManager.AddParticle(new SplortParticle(1, playerPos + new Vector3(width / 2, 0, depth / 2), ConsoleColor.Yellow, 0.1f, 0.1f, 0.3f, 0.3f, 10, Vector3.Normalize(-playerVel + new Vector3(0, 2f, 0)), 4f, 15));
                     }
+                    SoundPlayer.PlaySound("step.wav", 0.3f);
                     timeSinceWalkParticle = 0;
                 }
             }

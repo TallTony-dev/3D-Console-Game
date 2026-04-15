@@ -1,5 +1,6 @@
 ﻿using _3D_Console_Game.Engine;
 using _3D_Console_Game.Particles;
+using _3D_Console_Game.Sound;
 using System.IO;
 using System.Numerics;
 
@@ -19,8 +20,7 @@ namespace _3D_Console_Game.Items
         protected float duration;
         protected float velocity;
         protected float timeBetweenShots;
-
-        public WeaponItem(Player player, ConsoleColor col, Vector3 posOffset, float damage = 1, float duration = 4, float velocity = 8, float timeBetweenShots = 0.2f, float width = 0.5f, float height = 0.5f, float length = 1f) : base(player, col, Vector3.Zero, texture)
+        public WeaponItem(Player player, ConsoleColor col, Vector3 posOffset, float damage = 1, float duration = 4, float velocity = 20, float timeBetweenShots = 0.2f, float width = 0.5f, float height = 0.5f, float length = 1f) : base(player, col, Vector3.Zero, texture)
         {
             box = new Box(Vector3.Zero, width, height, length, col);
             this.damage = damage;
@@ -31,6 +31,8 @@ namespace _3D_Console_Game.Items
 
         protected virtual void Shoot(Vector3 dir, Vector3 pos)
         {
+
+            SoundPlayer.PlaySound("laser1.wav", 0.3f);
             Vector3 gunFront = box.MidBack;
             ParticleManager.AddParticle(new Bullet(duration, damage, velocity, pos, dir, col, false, true));
             for (int i = 0; i < 6; i++)

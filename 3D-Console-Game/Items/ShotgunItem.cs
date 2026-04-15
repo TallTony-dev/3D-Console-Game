@@ -1,4 +1,5 @@
 ﻿using _3D_Console_Game.Particles;
+using _3D_Console_Game.Sound;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace _3D_Console_Game.Items
 
         protected override void Shoot(Vector3 dir, Vector3 pos)
         {
-            
+            SoundPlayer.PlaySound("shotgun1.wav", 0.4f);
             Vector3 gunFront = box.MidBack;
             for (int i = 0; i < numShots; i++)
             {

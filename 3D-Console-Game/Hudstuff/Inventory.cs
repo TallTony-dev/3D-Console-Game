@@ -15,6 +15,7 @@ namespace _3D_Console_Game.Hudstuff
         public List<InventoryItem> items = new();
         public int selectedItem = 0;
         private int prevSelectedItem = 0;
+        private int maxItems = 10;
 
         public Inventory(Player p) : base((Console.WindowWidth) / 2 - 40, 0, Origin.BottomLeft, 80, 4)
         {
@@ -24,6 +25,16 @@ namespace _3D_Console_Game.Hudstuff
             items.Add(new WeaponItem(p, ConsoleColor.DarkMagenta, Vector3.Zero, 10));
             items.Add(new ShotgunItem(p, ConsoleColor.DarkGreen, 5));
             items.Add(new GrapplingItem(p, 6f));
+        }
+
+        public bool TryAddToInventory(InventoryItem item)
+        {
+            if (items.Count < maxItems)
+            {
+                items.Add(item);
+                return true;
+            }
+            return false;
         }
 
         public override void Update(float dt)
