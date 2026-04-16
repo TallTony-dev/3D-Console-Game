@@ -25,6 +25,7 @@ namespace _3D_Console_Game.Hudstuff
             items.Add(new WeaponItem(p, ConsoleColor.DarkMagenta, Vector3.Zero, 10));
             items.Add(new ShotgunItem(p, ConsoleColor.DarkGreen, 5));
             items.Add(new GrapplingItem(p, 6f));
+            items.Add(new TelescopeItem(ConsoleColor.DarkMagenta, p));
         }
 
         public bool TryAddToInventory(InventoryItem item)

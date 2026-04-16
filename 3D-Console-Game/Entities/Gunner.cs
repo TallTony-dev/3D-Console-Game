@@ -19,14 +19,12 @@ namespace _3D_Console_Game.Entities
         }
 
         double timeSinceAttacked = -0.5;
-        double timeSinceTakenDamage = 10;
 
         Box gun;
 
         public override void TakeDamage(float damage, Vector3 sourcePos)
         {
             health -= damage;
-            timeSinceTakenDamage = 0;
             base.TakeDamage(damage, sourcePos);
         }
 
@@ -35,7 +33,6 @@ namespace _3D_Console_Game.Entities
             base.Update(dt);
             Player player = Program.game.player;
             Vector3 target = player.Hitbox.MidPoint;
-            timeSinceTakenDamage += dt;
             timeSinceAttacked += dt;
 
             Vector3 toTargetFromGun = target - gun.MidPoint;

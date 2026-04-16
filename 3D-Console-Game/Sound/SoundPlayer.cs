@@ -23,6 +23,7 @@ namespace _3D_Console_Game.Sound
             var audioFile = new AudioFileReader("./Sound/Resources/" + fileName);
             var outputDevice = new WaveOutEvent();
             outputDevice.Volume = vol;
+            
             outputDevice.Init(audioFile);
             outputDevice.Play();
             

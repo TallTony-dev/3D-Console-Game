@@ -39,13 +39,15 @@ namespace _3D_Console_Game
         Vector3 playerPos = new Vector3(0,0,0); 
         public Matrix4x4 ViewMatrix { 
             get {
-                // View matrix = inverse of camera transform
+                // LLM to fix issue: View matrix = inverse of camera transform
                 // First undo rotation (conjugate), then undo translation (negate)
                 Matrix4x4 rot = Matrix4x4.CreateFromQuaternion(Quaternion.Conjugate(view));
                 Matrix4x4 trans = Matrix4x4.CreateTranslation(-CamPos);
                 Matrix4x4 vertInvert = Matrix4x4.Identity;
                 vertInvert.M22 = -1;
-                return trans * rot * vertInvert;
+                float zoomFactor = 1f / (timeSinceDashed * 4 + 1f) + this.zoomFactor;
+                Matrix4x4 zoom = Matrix4x4.CreateScale(zoomFactor, zoomFactor, 1f);
+                return trans * rot * vertInvert * zoom;
             } 
         }
 
@@ -53,7 +55,7 @@ namespace _3D_Console_Game
 
         float moveSpeed;
         float rotSpeed;
-
+        float zoomFactor = 1;
         Vector3 playerVel;
 
         public float health { get; private set; }
@@ -84,11 +86,17 @@ namespace _3D_Console_Game
                 timeSinceDamageTaken = 0;
             }
         }
-
+        public void SetZoom(float zoom)
+        {
+            zoomFactor = zoom;
+        }
         public bool ObjectCollidedWithPlayer(object obj)
         {
             return collidedObjects.Contains(obj);
         }
+
+        int dashesRemaining = 2;
+        float timeSinceDashed = 0;
 
         bool wasTouchingGround = true;
         bool isSliding = false;
@@ -168,6 +176,7 @@ namespace _3D_Console_Game
                 isSliding = false;
             }
 
+            Vector3 playerIntendedDir = Vector3.Zero;
             if (isSliding)
             {
                 timeSliding += dt;
@@ -179,19 +188,38 @@ namespace _3D_Console_Game
                 if (InputManager.IsCharPressedAsync('W'))
                 {
                     playerVel += xzForward * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzForward)) + 0.1f);
+                    playerIntendedDir += xzForward;
                 }
                 if (InputManager.IsCharPressedAsync('S'))
                 {
                     playerVel -= xzForward * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzForward)) + 0.1f);
+                    playerIntendedDir -= xzForward;
                 }
                 if (InputManager.IsCharPressedAsync('A'))
                 {
                     playerVel += xzLeft * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzLeft)) + 0.1f);
+                    playerIntendedDir += xzLeft;
+
                 }
                 if (InputManager.IsCharPressedAsync('D'))
                 {
                     playerVel -= xzLeft * moveSpeed * dt / (Math.Abs(Vector3.Dot(playerVel, xzLeft)) + 0.1f);
+                    playerIntendedDir -= xzLeft;
                 }
+            }
+            playerIntendedDir = playerIntendedDir.LengthSquared() > 0.0001f ? Vector3.Normalize(playerIntendedDir) : xzForward;
+
+            timeSinceDashed += dt;
+            if (InputManager.IsLeftShiftPressed() && dashesRemaining > 0 && timeSinceDashed > 0.5f)
+            {
+                dashesRemaining--;
+                timeSinceDashed = 0;
+                playerVel += playerIntendedDir * 9;
+                SoundPlayer.PlaySound("dash1.wav", 0.7f);
+            }
+            if (isTouchingGround)
+            {
+                dashesRemaining = 1;
             }
 
             //if (InputManager.IsCharPressedAsync('R'))
