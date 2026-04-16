@@ -21,6 +21,8 @@ namespace _3D_Console_Game.Engine
         static Vector2 mouseDelta;
         static bool isLeftMousePressed = false;
         static bool isLeftMouseDown = false;
+        static bool isLeftShiftPressed = false;
+        static bool isLeftShiftDown = false;
         static bool lockMousePos = false;
 
         //static IntPtr consoleHandle = GetConsoleWindow();
@@ -34,6 +36,14 @@ namespace _3D_Console_Game.Engine
         public static bool IsLeftMousePressed()
         {
             return isLeftMousePressed;
+        }
+        public static bool IsLeftShiftDown()
+        {
+            return isLeftShiftDown;
+        }
+        public static bool IsLeftShiftPressed()
+        {
+            return isLeftShiftPressed;
         }
         public static bool IsKeyPressed(ConsoleKey key)
         {
@@ -91,6 +101,19 @@ namespace _3D_Console_Game.Engine
                 isLeftMouseDown = true;
             }
             else { isLeftMouseDown = false; }
+
+            if (InputManager.IsCharPressedAsync(0xA0))
+            {
+                if (!isLeftShiftDown && !isLeftShiftPressed)
+                {
+                    isLeftShiftPressed = true;
+                }
+                else if (isLeftShiftPressed)
+                    isLeftShiftPressed = false;
+
+                isLeftShiftDown = true;
+            }
+            else { isLeftShiftDown = false; }
             GetCursorPos(ref currentPos);
 
             float widthScale = (float)(screenRect.Right - screenRect.Left) / Console.WindowWidth;
